@@ -6,7 +6,7 @@
 <title>Moth Night: a breeding game prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;0,800;1,500&family=Alegreya+Sans:wght@400;500;700;800&family=Zilla+Slab:ital,wght@0,500;0,700;1,500&family=Patrick+Hand&family=Nunito:wght@400;600;700;800&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#e7e3f4; --bg2:#d9d3ef; --panel:#f6f4fc; --ink:#221e3c; --muted:#5d587c; --line:#cdc6e6;
@@ -16,7 +16,7 @@
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;color:var(--ink);background:radial-gradient(120% 60% at 85% -10%, var(--bg2) 0%, transparent 60%), var(--bg);background-color:var(--bg);
-  font-family:"Alegreya Sans", "Trebuchet MS", system-ui, sans-serif;font-size:16px;line-height:1.45}
+  font-family:var(--f-body);font-size:16px;line-height:1.45}
 button,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--lantern);outline-offset:2px}
 h2{margin:0;font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
@@ -243,7 +243,7 @@ body{color:var(--ink);background:
   repeating-linear-gradient(90deg,transparent 0 150px,rgba(0,0,0,.45) 150px 152px,rgba(255,220,170,.05) 152px 154px),
   repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 154px,rgba(0,0,0,.08) 154px 308px,rgba(255,210,150,.04) 308px 462px),
   linear-gradient(180deg,#4a301b,#2e1d10);background-color:var(--walnut)}
-h1,h2,h3{font-family:"IM Fell English SC", Georgia, serif;font-weight:400;letter-spacing:.01em}
+h1,h2,h3{font-family:var(--f-display);font-weight:var(--fw-display);letter-spacing:var(--ls-display)}
 .topbar h1{color:var(--paper);font-size:clamp(1.35rem,5vw,1.9rem);text-shadow:0 2px 0 #0008}
 .stat{background:var(--paperTex),linear-gradient(#f4e6c6,#e2cb9b);border:1.5px solid var(--frame);color:var(--ink);box-shadow:0 2px 0 #0005}
 .stat.coin b{color:#8a5a12}
@@ -310,7 +310,7 @@ dialog.dlg::backdrop{background:#1c1006b3}
 .bar .mk{border-color:#f6ead0}
 .cmp select,.dev select{background:#f8eed7;border-color:#9c7646}
 .x{color:#6a4f33}
-.info h4{font-family:"IM Fell English SC", Georgia, serif;font-weight:400;font-size:1.15rem}
+.info h4{font-family:var(--f-display);font-weight:var(--fw-display);font-size:1.15rem}
 
 /* testing panel */
 .dev{background:var(--paperTex),linear-gradient(#f3e5c5,#e5cf9f);border-left:6px solid var(--frame)}
@@ -352,8 +352,8 @@ dialog.dlg::backdrop{background:#1c1006b3}
 .visitor.caught{pointer-events:none;transition:transform .75s cubic-bezier(.55,0,.75,.4),opacity .75s ease-in}
 .quote{position:relative;background:#fffaf0aa;border:2px solid #9c7646;border-radius:14px;padding:14px 16px 10px;margin:4px 0 6px;box-shadow:0 3px 8px #0002}
 .quote::before{content:'';position:absolute;top:-10px;left:28px;width:16px;height:16px;background:#fbf3e2;border-left:2px solid #9c7646;border-top:2px solid #9c7646;transform:rotate(45deg)}
-.quote p{margin:0;font-family:"IM Fell English SC",Georgia,serif;font-size:1.35rem;line-height:1.3;color:var(--ink)}
-.quote p b{font-family:"Alegreya Sans",sans-serif;font-weight:800;color:#7a4c0e;white-space:nowrap}
+.quote p{margin:0;font-family:var(--f-quote);font-style:var(--fs-quote);font-weight:var(--fw-quote);font-size:var(--sz-quote);line-height:1.3;color:var(--ink)}
+.quote p b{font-family:var(--f-body);font-style:normal;font-weight:800;color:#7a4c0e;white-space:nowrap}
 .quote span{display:block;margin-top:6px;font-size:.88rem;color:#6a4f33;font-style:italic}
 .quote span::before{content:'— '}
 
@@ -371,8 +371,8 @@ dialog.dlg::backdrop{background:#1c1006b3}
 .par figcaption{font-weight:700;font-size:.92rem;margin-top:4px}
 .par figcaption small{font-weight:400;color:#6a4f33}
 .parbtn{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;border-radius:4px}
-.stage.unknown{display:grid;place-items:center;aspect-ratio:230/220;font-family:"IM Fell English SC",Georgia,serif;font-size:3.2rem;color:#9c7646;opacity:.85}
-.dlg .sub{text-align:center;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:1.1rem;margin:4px 0 6px}
+.stage.unknown{display:grid;place-items:center;aspect-ratio:230/220;font-family:var(--f-display);font-size:3.2rem;color:#9c7646;opacity:.85}
+.dlg .sub{text-align:center;font-family:var(--f-display);font-weight:var(--fw-display);font-size:1.1rem;margin:4px 0 6px}
 .parents{margin-bottom:12px !important}
 .parents .stage{max-width:110px;margin:0 auto}
 .langsw{display:flex;align-items:center;gap:6px;margin:0 0 6px;flex-wrap:wrap}
@@ -407,6 +407,44 @@ dialog.dlg::backdrop{background:#1c1006b3}
 html,body{max-width:100vw;overflow-x:hidden}
 #navOrders{flex:1.5}
 @media (max-width:340px){.navbar button{font-size:.66rem}}
+
+/* ---------- boxes ---------- */
+.boxhead{margin-bottom:8px}
+.boxbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;flex:1;min-width:0}
+.boxbar::-webkit-scrollbar{display:none}
+.boxtab{flex:none;display:flex;align-items:baseline;gap:6px;border:2px solid var(--frame);border-radius:8px 8px 4px 4px;padding:.3rem .7rem;cursor:pointer;
+  background:var(--wood-light);color:var(--ink);font-weight:800;font-size:.92rem;box-shadow:0 2px 0 #0006;max-width:180px}
+.boxtab .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.boxtab small{font-weight:600;font-size:.75rem;color:#5b4229}
+.boxtab[aria-selected="true"]{background:var(--paperTex),linear-gradient(#f4e6c6,#e2cb9b);border-color:var(--brass);box-shadow:0 0 0 2px #e9b85288,0 2px 0 #0006}
+.boxtab.add{padding:.3rem .75rem;font-size:1.05rem;line-height:1;background:#00000033;border-style:dashed;color:var(--paper)}
+.boxtab.over{background:linear-gradient(#f0c766,#c9922f);border-color:#5e3c0c}
+.boxlabel{display:block;font-weight:700;margin:8px 0 2px}
+.boxlabel input{display:block;width:100%;margin-top:6px;padding:.5rem .7rem;border-radius:10px;border:1.5px solid #9c7646;background:#f8eed7;font:inherit;color:var(--ink)}
+.grid .empty{grid-column:1/-1;padding:28px 16px}
+.boxtab small{color:#3f2b17;opacity:.85}
+.boxtab[aria-selected="true"] small{color:#5b4229;opacity:1}
+:root{--f-display:"Alegreya",Georgia,serif;--fw-display:700;--ls-display:0;--f-body:"Alegreya Sans","Trebuchet MS",system-ui,sans-serif;
+  --f-quote:"Alegreya",Georgia,serif;--fs-quote:italic;--fw-quote:500;--sz-quote:1.3rem}
+html[data-font="crate"]{--f-display:"Zilla Slab",Rockwell,Georgia,serif;--fw-display:700;--ls-display:.005em;--f-quote:"Zilla Slab",Georgia,serif;--fs-quote:italic;--fw-quote:500}
+html[data-font="notes"]{--f-display:"Patrick Hand","Comic Sans MS",cursive;--fw-display:400;--ls-display:.01em;--f-body:"Nunito",system-ui,sans-serif;--f-quote:"Patrick Hand","Comic Sans MS",cursive;--fs-quote:normal;--fw-quote:400;--sz-quote:1.45rem}
+html[data-font="print"]{--f-display:"IM Fell English SC",Georgia,serif;--fw-display:400;--ls-display:.01em;--f-quote:"IM Fell English SC",Georgia,serif;--fs-quote:normal;--fw-quote:400;--sz-quote:1.35rem}
+.devfont{display:flex;align-items:center;gap:8px;width:100%;font-size:.88rem;color:var(--muted)}
+.devfont select{flex:1}
+
+.boxwrap{position:relative;flex:1;min-width:0;display:flex;align-items:center}
+.boxwrap .boxbar{scroll-behavior:smooth}
+.boxwrap.can-l .boxbar{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 34px);mask-image:linear-gradient(90deg,transparent 0,#000 34px)}
+.boxwrap.can-r .boxbar{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent 100%)}
+.boxwrap.can-l.can-r .boxbar{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%)}
+.boxarrow{position:absolute;top:50%;z-index:2;width:30px;height:30px;margin-top:-17px;border-radius:50%;border:1.5px solid #5e3c0c;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#f0cd7a,#c9922f 55%,#8c5d18);color:#2f2013;font-weight:800;font-size:1.25rem;line-height:1;padding:0 0 3px;
+  box-shadow:0 2px 4px #0008;display:none;place-items:center}
+.boxarrow.l{left:-2px}.boxarrow.r{right:-2px}
+.boxwrap.can-l .boxarrow.l,.boxwrap.can-r .boxarrow.r{display:grid}
+body.is-dragging .boxarrow{outline:2px dashed var(--brass);outline-offset:2px}
+.boxtab small{color:#3a2614 !important;opacity:.8 !important;font-weight:700}
+.boxtab[aria-selected="true"] small{color:#4a331c !important;opacity:1 !important}
 </style>
 </head>
 <body>
@@ -423,7 +461,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 
 <main class="screens">
   <section class="pane" id="paneStable" data-i18n-aria="pane.moths">
-    <div class="panehead"><h2><span data-i18n="pane.moths">Moths</span> <small id="count"></small></h2></div>
+    <div class="panehead boxhead"><div class="boxwrap" id="boxwrap"><button class="boxarrow l" data-act="boxScroll" data-dir="-1" data-i18n-aria="scrollLeft" tabindex="-1">‹</button><div class="boxbar" id="boxbar" role="tablist" data-i18n-aria="pane.moths"></div><button class="boxarrow r" data-act="boxScroll" data-dir="1" data-i18n-aria="scrollRight" tabindex="-1">›</button></div></div>
     <div class="scroll" id="stableScroll" data-drop="grid"><div id="grid" class="grid"></div></div>
     <section id="dock" class="dock open" data-i18n-aria="nav.breeding">
       <div class="dock-body">
@@ -479,6 +517,7 @@ html,body{max-width:100vw;overflow-x:hidden}
     <button class="linkbtn" data-act="devCoins">Add 100 coins</button>
     <button class="linkbtn" data-act="devOrders">New commissions</button>
     <button class="linkbtn" data-act="devGarden">Send a garden moth</button>
+    <label class="devfont">Font <select id="devFont"><option value="journal">Naturalist's journal</option><option value="crate">Wooden crate</option><option value="notes">Field notes</option><option value="print">Old print (previous)</option></select></label>
   </div>
   </div>
 </aside>
@@ -486,7 +525,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const KEY='mothnight-v2', CAP=12;
+const KEY='mothnight-v2', BOXCAP=20, MAXBOXES=10;
 const COST={look:2,swap:3};
 const TRAITS=[
   {k:'hue',n:4,label:'Hue'},{k:'sat',n:2,label:'Color strength'},{k:'light',n:2,label:'Lightness'},
@@ -506,6 +545,7 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 function gauss(r=Math.random){let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())}
 const pick=(a,r=Math.random)=>a[Math.floor(r()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pc=x=>Math.round(x*100)+'%';
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
@@ -658,7 +698,8 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.moths)&&Array.isArray(s.orders)&&Array.isArray(s.garden))return s}catch(e){}return null}
 function newGame(){
   state={coins:70,moths:[],orders:[],garden:[],sel:[null,null],ui:state&&state.ui||{dock:true},nextId:1,deliveries:0,bestGen:0,tuning:state&&state.tuning||defaultTuning()};
-  for(let i=0;i<4;i++)state.moths.push(newMoth(wildGenes()));
+  state.boxes=[{id:state.nextId++,name:''}];state.ui.box=state.boxes[0].id;
+  for(let i=0;i<4;i++)addMoth(newMoth(wildGenes()));
   for(let i=0;i<3;i++)state.garden.push(newMoth(wildGenes()));
   for(let i=0;i<3;i++)state.orders.push(newOrder());
 }
@@ -679,18 +720,24 @@ function render(){
   document.getElementById('coins').textContent=state.coins;
   document.getElementById('gen').textContent=state.bestGen;
   document.getElementById('del').textContent=state.deliveries;
-  document.getElementById('count').textContent=`${state.moths.length}/${CAP}`;
+  const cb=curBox();
+  document.getElementById('boxbar').innerHTML=state.boxes.map(b=>{const n=inBox(b.id).length,on=b===cb;
+    return `<button class="boxtab" role="tab" aria-selected="${on}" data-act="box" data-id="${b.id}" data-drop="box:${b.id}" data-spring="box:${b.id}"><span class="bn">${esc(boxName(b))}</span><small>${n}/${BOXCAP}</small></button>`}).join('')
+    +(state.boxes.length<MAXBOXES?`<button class="boxtab add" data-act="addBox" aria-label="${t('addBox')}">+</button>`:'');
+  requestAnimationFrame(updateBoxArrows);
+  if(render.lastBox!==cb.id){render.lastBox=cb.id;requestAnimationFrame(()=>{const at=document.querySelector('.boxtab[aria-selected="true"]');if(at&&at.scrollIntoView)at.scrollIntoView({block:'nearest',inline:'nearest'})})}
   const app=document.getElementById('app');app.dataset.panel=state.ui.panel||'';
   document.getElementById('navMoths').setAttribute('aria-pressed',!state.ui.panel);
   document.getElementById('navOrders').setAttribute('aria-pressed',state.ui.panel==='orders');
   document.getElementById('navGarden').setAttribute('aria-pressed',state.ui.panel==='garden');
 
-  document.getElementById('grid').innerHTML=state.moths.length?state.moths.map(m=>{
+  const shown=inBox(cb.id);
+  document.getElementById('grid').innerHTML=shown.length?shown.map(m=>{
     const si=state.sel.indexOf(m.id);
     return `<div class="card${si>=0?' sel':''}${hatched.has(m.id)?' hatch':''}" data-drag="stable" data-drop="card" data-id="${m.id}" tabindex="0" role="button" aria-label="${t('cardAria',{name:m.name,gen:m.gen,slot:si>=0?t('cardSlot',{n:si+1}):''})}">
       ${si>=0?`<span class="pin">${t('parentN',{n:si+1})}</span>`:''}
       <span class="stage">${mothSVG(phen(m.genes),m.id)}</span><span class="nm">${m.name}</span><span class="meta">${t('gen',{n:m.gen})}</span></div>`;
-  }).join(''):`<div class="empty">${t('empty')}</div>`;
+  }).join(''):`<div class="empty">${state.moths.length?t('emptyBox'):t('empty')}</div>`;
 
   [0,1].forEach(i=>{
     const el=document.getElementById('slot'+i),m=byId(state.sel[i]);
@@ -711,8 +758,9 @@ function render(){
   const [a,b]=state.sel.map(byId);
   const pred=a&&b?predict(a,b):null;
   const bb=document.getElementById('breedBtn');
-  bb.disabled=!(a&&b)||state.moths.length>=CAP;
-  bb.textContent=state.moths.length>=CAP?t('stableFull'):t('breed');
+  const free=totalFree();
+  bb.disabled=!(a&&b)||free<=0;
+  bb.textContent=free<=0?t('noSpace'):t('breed');
   document.getElementById('sellLabel').textContent=t('nav.release');
 
   let payable=0;
@@ -773,6 +821,14 @@ function renderDialog(){
       <button data-act="lang" data-lang="en" aria-pressed="${lang()==='en'}">English</button><button data-act="lang" data-lang="es" aria-pressed="${lang()==='es'}">Español</button></div>
     <div class="info">${t('info')({min:pc(state.tuning.payMin),full:pc(state.tuning.payFull)})}</div>
     <div class="dacts"><button class="linkbtn" data-act="reset">${t('startOver')}</button></div>`;
+  }else if(dlgState.t==='box'){
+    const b=state.boxes.find(x=>x.id===dlgState.id);if(!b){dlgState=null;if(dlg.open)dlg.close();return}
+    const canDel=state.boxes.length>1&&!inBox(b.id).length;
+    html=`<div class="dhead"><div><h3>${esc(boxName(b))}</h3><div class="meta">${inBox(b.id).length}/${BOXCAP}</div></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
+      <label class="boxlabel">${t('renameBox')}<input id="boxName" maxlength="24" value="${esc(b.name||'')}" placeholder="${esc(boxName(b))}"></label>
+      <div class="dacts"><button class="btn primary" data-act="boxSave" data-id="${b.id}">${t('save')}</button>
+      ${canDel?`<button class="btn" data-act="boxDel" data-id="${b.id}">${t('deleteBox')}</button>`:''}</div>
+      ${!canDel&&state.boxes.length>1?`<p class="subnote" style="margin-top:10px">${t('deleteHint')}</p>`:''}`;
   }
   dlg.innerHTML=html;
   if(!dlg.open)dlg.showModal();
@@ -789,6 +845,11 @@ document.addEventListener('click',e=>{
   else if(act==='info')dlgState={t:'info'};
   else if(act==='nav'){const pnl=el.dataset.panel;state.ui.panel=(pnl&&state.ui.panel===pnl)?'':pnl}
   else if(act==='closePanel')state.ui.panel='';
+  else if(act==='box'){if(state.ui.box===id)dlgState={t:'box',id};else state.ui.box=id}
+  else if(act==='boxScroll'){const bar=document.getElementById('boxbar');bar.scrollBy({left:(+el.dataset.dir)*Math.max(120,bar.clientWidth*.7)});return}
+  else if(act==='addBox'){if(state.boxes.length<MAXBOXES){const b={id:state.nextId++,name:''};state.boxes.push(b);state.ui.box=b.id}}
+  else if(act==='boxSave'){const b=state.boxes.find(x=>x.id===id),v=(document.getElementById('boxName').value||'').trim().slice(0,24);if(b)b.name=v;dlgState=null}
+  else if(act==='boxDel'){const b=state.boxes.find(x=>x.id===id);if(b&&state.boxes.length>1&&!inBox(id).length){state.boxes=state.boxes.filter(x=>x!==b);state.ui.box=state.boxes[0].id}dlgState=null}
   else if(act==='lang'){state.ui.lang=el.dataset.lang;try{localStorage.setItem('mothnight-lang',state.ui.lang)}catch(e){}}
   else if(act==='sellHint'){toast(t('releaseHint'));return}
   else if(act==='close')dlgState=null;
@@ -807,9 +868,9 @@ document.addEventListener('click',e=>{
     catchVisitor(+el.dataset.vid);
   }else if(act==='breed'){
     const [a,b]=state.sel.map(byId);if(!a||!b)return;
-    const n=Math.min(CAP-state.moths.length,2+(Math.random()<.5?1:0));let mut=0;const kids=[];
+    const n=Math.min(totalFree(),2+(Math.random()<.5?1:0));let mut=0;const kids=[];
     for(let i=0;i<n;i++){const c=child(a,b);if(c.mut)mut++;const k=newMoth(c.genes,Math.max(a.gen,b.gen)+1);k.parents=[a,b].map(x=>({id:x.id,name:x.name,gen:x.gen,genes:x.genes}));kids.push(k);fresh.add(k.id)}
-    state.moths.push(...kids);state.bestGen=Math.max(state.bestGen,...kids.map(k=>k.gen));
+    kids.forEach(k=>addMoth(k));state.bestGen=Math.max(state.bestGen,...kids.map(k=>k.gen));
     toast(t('hatched',{n,names:kids.map(k=>k.name).join(', ')})+(mut?(mut===1?t('mutOne'):t('mutMany',{n:mut})):''));
   }else if(act==='deliver'){
     const o=state.orders.find(x=>x.id===id),m=byId(+el.dataset.mid);if(!o||!m)return;
@@ -954,8 +1015,8 @@ function syncGarden(){
 }
 function catchVisitor(vid){
   const v=G.vis.find(x=>x.vid===vid);if(!v||v.caught)return;
-  if(state.moths.length>=CAP)return toast(t('stableFullMsg'));
-  state.moths.push(v.m);fresh.add(v.m.id);v.caught=true;
+  if(!addMoth(v.m))return toast(t('allFull'));
+  fresh.add(v.m.id);v.caught=true;
   const nr=document.getElementById('navMoths').getBoundingClientRect(),sr=sceneBox();
   const tx=nr.left+nr.width/2-sr.left-v.size/2,ty=nr.top+nr.height/2-sr.top-v.h*.418;
   v.el.classList.add('caught');v.el.classList.replace('resting','flying');
@@ -967,6 +1028,10 @@ function catchVisitor(vid){
 /* ---------- localization ---------- */
 const I18N={
 en:{
+  scrollLeft:'Scroll boxes left',scrollRight:'Scroll boxes right',
+  boxN:'Box {n}',addBox:'Add box',boxFull:'That box is full',allFull:'All your boxes are full. Release a moth or add a box.',noSpace:'No space',
+  movedTo:'{name} moved to {box}',renameBox:'Box name',save:'Save',deleteBox:'Delete box',deleteHint:'Empty this box to delete it.',
+  emptyBox:'This box is empty. Drag a moth onto its tab to move it here.',
   title:'Moth Night','stat.coins':'Coins','stat.gen':'Best generation','stat.del':'Commissions delivered',help:'How to play',
   'pane.moths':'Moths','pane.orders':'Commissions','pane.garden':'Garden','nav.release':'Release','nav.letgo':'Let go','nav.breeding':'Breeding',
   'nav.aria':'Game panels','release.aria':'Release. Drag a moth here to let it go','closeOrders':'Close commissions','closeGarden':'Close garden',
@@ -991,6 +1056,7 @@ en:{
     <ul><li>Tap a moth to see its details.</li>
     <li>Drag a moth to a breeding slot or a commission, or onto Release in the bottom bar to let it go. On touch screens, press and hold first.</li>
     <li>Drag a moth between other moths to reorder your collection.</li>
+    <li>Each box holds 20 moths. Tap + to add a box. Drop a moth on a box tab to move it there, or hold over a tab to open that box. Tap the open box's tab to rename or delete it.</li>
     <li>While dragging, hold over Moths, Commissions or Breeding in the bottom bar to open that screen.</li>
     <li>Released a moth by mistake? Tap Undo on the message that appears.</li></ul>
     <h4>Breeding</h4>
@@ -1012,6 +1078,10 @@ en:{
     great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']}
 },
 es:{
+  scrollLeft:'Desplazar cajas a la izquierda',scrollRight:'Desplazar cajas a la derecha',
+  boxN:'Caja {n}',addBox:'Añadir caja',boxFull:'Esa caja está llena',allFull:'Todas tus cajas están llenas. Libera una polilla o añade una caja.',noSpace:'Sin espacio',
+  movedTo:'{name} se ha movido a {box}',renameBox:'Nombre de la caja',save:'Guardar',deleteBox:'Eliminar caja',deleteHint:'Vacía esta caja para eliminarla.',
+  emptyBox:'Esta caja está vacía. Arrastra una polilla a su pestaña para moverla aquí.',
   title:'Noche de Polillas','stat.coins':'Monedas','stat.gen':'Mejor generación','stat.del':'Encargos entregados',help:'Cómo jugar',
   'pane.moths':'Polillas','pane.orders':'Encargos','pane.garden':'Jardín','nav.release':'Liberar','nav.letgo':'Soltar','nav.breeding':'Cría',
   'nav.aria':'Paneles del juego','release.aria':'Liberar. Arrastra una polilla aquí para soltarla','closeOrders':'Cerrar encargos','closeGarden':'Cerrar jardín',
@@ -1036,6 +1106,7 @@ es:{
     <ul><li>Toca una polilla para ver sus detalles.</li>
     <li>Arrastra una polilla a un hueco de cría o a un encargo, o a Liberar en la barra inferior para soltarla. En pantallas táctiles, mantén pulsado primero.</li>
     <li>Arrastra una polilla entre otras para reordenar tu colección.</li>
+    <li>Cada caja guarda 20 polillas. Toca + para añadir una caja. Suelta una polilla sobre la pestaña de una caja para moverla allí, o mantenla encima para abrir esa caja. Toca la pestaña de la caja abierta para renombrarla o eliminarla.</li>
     <li>Mientras arrastras, mantén la polilla sobre Polillas, Encargos o Cría en la barra inferior para abrir esa pantalla.</li>
     <li>¿Has liberado una polilla por error? Toca Deshacer en el mensaje que aparece.</li></ul>
     <h4>Cría</h4>
@@ -1056,6 +1127,7 @@ es:{
     good:['¡Está bastante bien! Te pago {c}.','Qué bonita, se parece mucho. {c}, trato hecho.','Así sí. Te pago {c} con gusto.'],
     great:['¡Perfecta, justo lo que imaginaba! Aquí tienes {c}.','¡Es esta! Toma {c}, te lo has ganado.','Maravillosa, tal como la imaginé. {c} para ti.']}
 }};
+const tr=(k,v)=>t(k,v);
 const lang=()=>state&&state.ui&&I18N[state.ui.lang]?state.ui.lang:'en';
 function t(k,vars){let v=I18N[lang()][k];if(v==null)v=I18N.en[k];if(typeof v!=='string')return v;
   return vars?v.replace(/\{(\w+)\}/g,(_,x)=>vars[x]!=null?vars[x]:''):v}
@@ -1065,9 +1137,29 @@ function clientName(o){
 }
 function applyStatic(){
   document.documentElement.lang=lang();document.title=t('title');
+  document.documentElement.dataset.font=(state.ui&&state.ui.font)||'journal';
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
   document.querySelectorAll('[data-i18n-aria]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.i18nAria))});
   document.querySelectorAll('[data-i18n-title]').forEach(el=>{el.title=t(el.dataset.i18nTitle);el.setAttribute('aria-label',t(el.dataset.i18nTitle))});
+}
+
+/* ---------- boxes ---------- */
+function boxName(b){const i=state.boxes.indexOf(b);return b.name||t('boxN',{n:i+1})}
+const curBox=()=>state.boxes.find(b=>b.id===state.ui.box)||state.boxes[0];
+const inBox=id=>state.moths.filter(m=>m.box===id);
+const boxFree=b=>BOXCAP-inBox(b.id).length;
+const totalFree=()=>state.boxes.reduce((n,b)=>n+Math.max(0,boxFree(b)),0);
+function boxFor(){const c=curBox();if(boxFree(c)>0)return c;return state.boxes.find(b=>boxFree(b)>0)||null}
+function addMoth(m,at){
+  const b=boxFor();if(!b)return false;
+  m.box=b.id;if(at!=null)state.moths.splice(Math.min(at,state.moths.length),0,m);else state.moths.push(m);
+  return true;
+}
+function moveToBox(id,boxId){
+  const m=byId(id),b=state.boxes.find(x=>x.id===boxId);if(!m||!b||m.box===boxId)return;
+  if(boxFree(b)<=0)return toast(t('boxFull'));
+  state.moths=state.moths.filter(x=>x!==m);m.box=boxId;state.moths.push(m);
+  toast(t('movedTo',{name:m.name,box:boxName(b)}));
 }
 
 /* ---------- client reactions ---------- */
@@ -1100,11 +1192,26 @@ function flyAway(m){
 }
 function undoSell(){
   const L=lastSold;if(!L)return;lastSold=null;
-  if(state.moths.length>=CAP)return toast(t('cantBack'));
-  state.moths.splice(Math.min(L.idx,state.moths.length),0,L.m);fresh.add(L.m.id);
+  const ob=state.boxes.find(b=>b.id===L.m.box);
+  if(ob&&boxFree(ob)>0){state.moths.splice(Math.min(L.idx,state.moths.length),0,L.m)}else if(!addMoth(L.m,L.idx))return toast(t('cantBack'));
+  fresh.add(L.m.id);
   if(L.slot>=0&&state.sel[L.slot]==null)state.sel[L.slot]=L.m.id;
   toast(t('cameBack',{name:L.m.name}));
 }
+
+/* ---------- box tab scrolling ---------- */
+function updateBoxArrows(){
+  const bar=document.getElementById('boxbar'),w=document.getElementById('boxwrap');if(!bar||!w)return;
+  const max=bar.scrollWidth-bar.clientWidth;
+  w.classList.toggle('can-l',bar.scrollLeft>2);
+  w.classList.toggle('can-r',bar.scrollLeft<max-2);
+}
+(function(){
+  const bar=document.getElementById('boxbar');
+  bar.addEventListener('scroll',updateBoxArrows,{passive:true});
+  bar.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&bar.scrollWidth>bar.clientWidth){bar.style.scrollBehavior='auto';bar.scrollLeft+=e.deltaY;bar.style.scrollBehavior='';e.preventDefault()}},{passive:false});
+  window.addEventListener('resize',updateBoxArrows);
+})();
 
 /* ---------- drag and drop ---------- */
 const drag={src:null};
@@ -1122,6 +1229,7 @@ function springTo(pn){
   const mobile=window.innerWidth<900;
   if(pn==='breed'){if(mobile)state.ui.panel='';state.ui.dock=true}
   else if(pn==='moths')state.ui.panel='';
+  else if(pn.startsWith('box:')){state.ui.panel='';state.ui.box=+pn.slice(4)}
   else state.ui.panel=pn;
   render();
 }
@@ -1132,6 +1240,14 @@ function nearestCard(x,y){
 }
 function autoScroll(){
   const d=drag.src;if(!d||!d.active)return;
+  const bar=document.getElementById('boxbar');
+  if(bar&&bar.offsetParent&&bar.scrollWidth>bar.clientWidth){
+    const r=document.getElementById('boxwrap').getBoundingClientRect();
+    if(d.y>r.top-12&&d.y<r.bottom+12){
+      let v=0;if(d.x<r.left+48)v=-Math.ceil((r.left+48-d.x)/5);else if(d.x>r.right-48)v=Math.ceil((d.x-(r.right-48))/5);
+      if(v){bar.style.scrollBehavior='auto';bar.scrollLeft+=v;bar.style.scrollBehavior='';updateBoxArrows();moveDrag(d.x,d.y)}
+    }
+  }
   const sc=document.getElementById('stableScroll');
   if(d.from==='stable'&&sc&&sc.offsetParent){
     const r=sc.getBoundingClientRect();let v=0;
@@ -1153,7 +1269,8 @@ function moveDrag(x,y){
     if(d.from!=='stable')t=t.dataset.drop==='grid'||t.dataset.drop==='card'?null:t;
     else{
       const c=t.dataset.drop==='card'?t:nearestCard(x,y);
-      if(!c||+c.dataset.id===d.id)t=null;
+      if(!c){t=t.dataset.drop==='grid'&&!document.querySelector('#grid .card:not(.dragging)')?t:null}
+      else if(+c.dataset.id===d.id)t=null;
       else{
         const r=c.getBoundingClientRect(),after=x>r.left+r.width/2;
         if(c!==d.insCard||after!==d.insAfter){clearIns();c.classList.add(after?'ins-after':'ins-before');d.insCard=c;d.insAfter=after}
@@ -1188,8 +1305,11 @@ function endDrag(drop){
   if(d.spring)d.spring.classList.remove('over');clearTimeout(d.springT);clearIns();
   document.getElementById('sellLabel').textContent=I18N[lang()]['nav.release'];
   const t=drop&&d.over?d.over.dataset.drop:null;
+  if(t&&t.startsWith('box:')){moveToBox(d.id,+t.slice(4));render();return}
+  if(t==='grid'&&d.from==='stable'){moveToBox(d.id,curBox().id);render();return}
   if(t==='card'&&d.from==='stable'){
-    const m=byId(d.id),tid=+d.over.dataset.id;
+    const m=byId(d.id),tid=+d.over.dataset.id,tm=byId(tid);
+    if(m&&tm&&m.box!==tm.box){const tb=state.boxes.find(b=>b.id===tm.box);if(boxFree(tb)<=0){toast(tr('boxFull'));render();return}m.box=tm.box;toast(tr('movedTo',{name:m.name,box:boxName(tb)}))}
     if(m&&tid!==d.id){
       state.moths=state.moths.filter(x=>x.id!==d.id);
       const idx=state.moths.findIndex(x=>x.id===tid);
@@ -1252,7 +1372,7 @@ const scheduleRender=()=>{clearTimeout(rTimer);rTimer=setTimeout(render,150)};
 function devOpen(){
   dev.open=true;
   if(!dev.genes){const m=byId(state.sel[0])||state.moths[0];dev.srcId=m?m.id:null;dev.genes=m?clone(m.genes):wildGenes()}
-  document.getElementById('dev').hidden=false;devBuild();
+  document.getElementById('dev').hidden=false;document.getElementById('devFont').value=state.ui.font||'journal';devBuild();
 }
 function devClose(){dev.open=false;document.getElementById('dev').hidden=true}
 function devTarget(){return state.orders.find(o=>o.id===dev.tgtId)||state.orders[0]}
@@ -1350,6 +1470,7 @@ document.addEventListener('input',e=>{
   devUpdate();
 });
 document.addEventListener('change',e=>{
+  if(e.target.id==='devFont'){state.ui.font=e.target.value;render();return}
   if(e.target.id==='devSrc'){const m=byId(+e.target.value);dev.srcId=m?m.id:null;dev.genes=m?clone(m.genes):wildGenes();devBuild()}
   if(e.target.id==='devTgt'){dev.tgtId=+e.target.value;devUpdate()}
   if(e.target.dataset&&e.target.dataset.dev)save();
@@ -1361,8 +1482,7 @@ document.addEventListener('click',e=>{
   if(act==='devTab'){dev.tab=el.dataset.tab;return devBuild()}
   if(act==='devRandom'){dev.genes=wildGenes();dev.srcId=null;devBuild();return}
   if(act==='devAdd'){
-    if(state.moths.length>=CAP)return toast(t('stableFullMsg'));
-    const m=newMoth(clone(dev.genes));state.moths.push(m);fresh.add(m.id);dev.srcId=m.id;toast(`${m.name} was added to your stable`);
+    const m=newMoth(clone(dev.genes));if(!addMoth(m))return toast(t('allFull'));fresh.add(m.id);dev.srcId=m.id;toast(`${m.name} was added to your stable`);
   }
   if(act==='devOverwrite'){const m=byId(dev.srcId);if(m){m.genes=clone(dev.genes);toast(`${m.name}'s genes were rewritten`)}}
   if(act==='devSetTarget'){const o=devTarget();if(o){o.target=phen(dev.genes);toast(`${clientName(o)} now wants this moth`)}}
@@ -1386,6 +1506,9 @@ document.getElementById('title').addEventListener('click',()=>{
 state=load();if(!state)newGame();
 if(!state.tuning||state.tuning.v!==3)state.tuning=defaultTuning();
 if(!state.ui)state.ui={dock:true};
+if(!Array.isArray(state.boxes)||!state.boxes.length)state.boxes=[{id:state.nextId++,name:''}];
+state.moths.forEach(m=>{if(!state.boxes.some(b=>b.id===m.box))m.box=state.boxes[0].id});
+if(!state.boxes.some(b=>b.id===state.ui.box))state.ui.box=state.boxes[0].id;
 if(!state.ui.lang){let l=null;try{l=localStorage.getItem('mothnight-lang')}catch(e){}state.ui.lang=l||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en')}
 if(state.ui.panel===undefined)state.ui.panel=window.innerWidth>=900?'orders':'';
 state.sel=[0,1].map(i=>state.sel&&byId(state.sel[i])?state.sel[i]:null);
