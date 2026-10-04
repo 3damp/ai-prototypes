@@ -14,13 +14,3 @@ Small experiments built with AI. Each prototype is a self-contained folder serve
 2. Name the entry file `index.html` so the URL is `.../my-new-prototype/`.
 3. Add a short `README.md` in the folder.
 4. Add a link to the root `index.html` and to the table above.
-
-## Setup after cloning
-
-Turn on the pre-commit check that blocks API keys, tokens, private keys, local file paths and your git email address:
-
-```sh
-git config core.hooksPath .githooks
-```
-
-If it flags a false positive, commit with `git commit --no-verify`.
