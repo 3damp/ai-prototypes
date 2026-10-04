@@ -1009,9 +1009,7 @@ en:{
     low:['It’s not really what I had in mind, but I’ll give you {c}.','Not quite it… I suppose I could pay {c}.','Close-ish. I’ll take it for {c}, no more.'],
     mid:['Not bad at all. I can offer {c}.','That’s getting there. I’ll pay {c} for it.','Fair enough, it’s a decent likeness. {c}?'],
     good:['This is quite good! I’ll pay {c}.','Oh, lovely. That’s very close. {c} it is.','Now we’re talking. I’ll happily pay {c}.'],
-    great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']},
-  gripes:{color:['The color is all wrong, though.','The color isn’t quite right.'],shape:['The wings aren’t the right shape.','The wing shape is a bit off.'],
-    marks:['The markings are wrong.','The markings aren’t quite right.'],extra:['The antennae aren’t right.','The antennae are a little off.']}
+    great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']}
 },
 es:{
   title:'Noche de Polillas','stat.coins':'Monedas','stat.gen':'Mejor generación','stat.del':'Encargos entregados',help:'Cómo jugar',
@@ -1056,9 +1054,7 @@ es:{
     low:['No es lo que tenía en mente, pero te doy {c}.','No es exactamente eso… supongo que podría pagar {c}.','Se acerca un poco. Me la quedo por {c}, ni una más.'],
     mid:['Nada mal. Puedo ofrecerte {c}.','Va por buen camino. Te pago {c}.','Me vale, se parece bastante. ¿{c}?'],
     good:['¡Está bastante bien! Te pago {c}.','Qué bonita, se parece mucho. {c}, trato hecho.','Así sí. Te pago {c} con gusto.'],
-    great:['¡Perfecta, justo lo que imaginaba! Aquí tienes {c}.','¡Es esta! Toma {c}, te lo has ganado.','Maravillosa, tal como la imaginé. {c} para ti.']},
-  gripes:{color:['Aunque el color está totalmente mal.','Aunque el color no es del todo correcto.'],shape:['Las alas no tienen la forma correcta.','La forma de las alas no acaba de encajar.'],
-    marks:['Las marcas están mal.','Las marcas no son del todo correctas.'],extra:['Las antenas no están bien.','Las antenas no acaban de encajar.']}
+    great:['¡Perfecta, justo lo que imaginaba! Aquí tienes {c}.','¡Es esta! Toma {c}, te lo has ganado.','Maravillosa, tal como la imaginé. {c} para ti.']}
 }};
 const lang=()=>state&&state.ui&&I18N[state.ui.lang]?state.ui.lang:'en';
 function t(k,vars){let v=I18N[lang()][k];if(v==null)v=I18N.en[k];if(typeof v!=='string')return v;
@@ -1078,13 +1074,7 @@ function applyStatic(){
 function clientQuote(o,m,s,pay){
   const f=pay/o.reward,tier=!pay?'none':f<.25?'low':f<.55?'mid':f<.85?'good':'great';
   const list=t('quotes')[tier],seed=(o.id*31+m.id*17)%997;
-  let q=list[seed%list.length].replace('{c}',`<b>${COIN}${pay}</b>`);
-  if(tier!=='great'){
-    const groups=matchParts(phen(m.genes),o.target).filter(g=>g.I>0).sort((a,b)=>a.score-b.score);
-    const worst=groups[0];
-    if(worst&&worst.score<.7)q+=' '+t('gripes')[worst.g][worst.score<.4?0:1];
-  }
-  return q;
+  return list[seed%list.length].replace('{c}',`<b>${COIN}${pay}</b>`);
 }
 
 /* ---------- selling with undo ---------- */
