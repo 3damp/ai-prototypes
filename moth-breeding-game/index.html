@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moth Night: a breeding game prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e7e3f4; --bg2:#d9d3ef; --panel:#f6f4fc; --ink:#221e3c; --muted:#5d587c; --line:#cdc6e6;
+  --lantern:#b9760f; --good:#3b7d5a; --chip:#ebe7f8; --body:#3d3350; --stage:#fdfcff; --stage-line:#e4dff4;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);background:radial-gradient(120% 60% at 85% -10%, var(--bg2) 0%, transparent 60%), var(--bg);background-color:var(--bg);
+  font-family:"Alegreya Sans", "Trebuchet MS", system-ui, sans-serif;font-size:16px;line-height:1.45}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--lantern);outline-offset:2px}
+h2{margin:0;font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+h2 small{font-weight:400;color:var(--muted);font-size:.95rem;margin-left:.3rem}
+.btn{border:0;border-radius:999px;padding:.55rem 1rem;font-weight:600;cursor:pointer;background:var(--chip);color:var(--ink)}
+.btn:hover:not(:disabled){filter:brightness(1.06)}
+.btn.primary{background:var(--lantern);color:#1d1606}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{padding:.35rem .75rem;font-size:.88rem}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.88rem}
+.linkbtn:disabled{opacity:.5;cursor:not-allowed}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:6px;cursor:grab;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.card .nm{font-weight:700;font-size:1.05rem;margin-top:6px;padding:0 6px}
+.card .meta{font-size:.8rem;color:var(--muted);padding:0 6px 4px}
+.card.dragging,.dslot.dragging .stage{opacity:.3}
+.card:hover{border-color:var(--muted)}
+.card.sel{border-color:var(--lantern);box-shadow:0 0 0 3px color-mix(in srgb,var(--lantern) 30%,transparent)}
+.card .pin{position:absolute;top:12px;left:12px;z-index:1;background:var(--lantern);color:#1d1606;font-size:.72rem;font-weight:700;border-radius:999px;padding:.1rem .5rem}
+.stage{display:block;background:var(--stage);border:1px solid var(--stage-line);border-radius:10px;padding:4px}
+.moth{width:100%;height:auto;display:block;overflow:visible}
+@media (prefers-reduced-motion:no-preference){
+  .card.hatch{animation:hatch .7s cubic-bezier(.2,.9,.3,1.3)}
+}
+@keyframes hatch{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:28px;color:var(--muted);text-align:center}
+
+.panel{background:var(--panel);border:1.5px solid var(--line);border-radius:20px;padding:16px}
+.note{color:var(--muted);margin:0 0 12px;font-size:.88rem}
+
+.orders{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.order{border-radius:14px;background:var(--chip);padding:10px}
+.otop{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:start}
+.order .who{font-size:.85rem;color:var(--muted);line-height:1.3}
+.order .reward{font-weight:800;color:var(--lantern);margin:2px 0}
+.order .best,.order .chance{font-size:.82rem;line-height:1.35;margin-top:3px}
+.order .chance{color:var(--muted)}
+.order .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+
+
+dialog.dlg{border:1.5px solid var(--line);border-radius:20px;background:var(--panel);color:var(--ink);padding:18px;width:calc(100% - 32px);max-width:460px;max-height:calc(100% - 32px)}
+dialog.dlg.wide{max-width:620px}
+dialog.dlg::backdrop{background:rgba(20,16,40,.55)}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.dlg h3{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.dlg .meta{color:var(--muted);font-size:.9rem}
+.dlg .big{max-width:250px;margin:0 auto 12px}
+.desc{margin:10px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.95rem}
+.desc dt{color:var(--muted)}
+.desc dd{margin:0;font-weight:600}
+.sub{font-size:.9rem;font-weight:700;margin:16px 0 6px}
+.subnote{font-size:.85rem;color:var(--muted);margin:0 0 8px}
+.fits{font-size:.88rem;margin:8px 0 0}
+.dacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.x{background:none;border:0;font-size:1.6rem;line-height:1;cursor:pointer;color:var(--muted);padding:2px 6px}
+
+.bars{display:grid;grid-template-columns:minmax(110px,auto) 1fr;gap:7px 12px;align-items:center;font-size:.85rem}
+.bars .lb{color:var(--muted)}
+.bar{position:relative;height:8px;background:var(--chip);border-radius:4px}
+.bar.hue{background:linear-gradient(90deg,hsl(0 70% 60%),hsl(60 70% 60%),hsl(120 70% 55%),hsl(180 70% 55%),hsl(240 70% 62%),hsl(300 70% 62%),hsl(340 70% 62%))}
+.bar .rg{position:absolute;top:0;bottom:0;border-radius:4px;background:color-mix(in srgb,var(--lantern) 45%,transparent)}
+.bar .mk{position:absolute;top:-4px;width:5px;height:16px;border-radius:3px;transform:translateX(-50%);background:var(--lantern);border:1.5px solid var(--panel)}
+.bar .mk.tg{background:var(--ink)}
+.bar .th{position:absolute;top:-2px;bottom:-2px;width:1.5px;background:var(--muted);opacity:.6}
+.legend{display:flex;gap:16px;font-size:.82rem;color:var(--muted);margin:4px 0 10px}
+.legend i{display:inline-block;width:5px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.cmp figure{margin:0}
+.cmp figcaption{font-size:.85rem;color:var(--muted);margin-top:4px;text-align:center}
+.cmp select{width:100%;margin-top:4px;padding:.35rem .5rem;border-radius:10px;border:1.5px solid var(--line);background:var(--panel)}
+.score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:6px 0 12px}
+.score strong{font-size:2rem;font-weight:800;line-height:1}
+.score span{color:var(--muted)}
+
+.dev{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);z-index:20;background:var(--panel);border-left:1.5px solid var(--line);
+  display:flex;flex-direction:column;overflow:hidden;padding-top:calc(14px + env(safe-area-inset-top,0px));box-shadow:-12px 0 40px rgba(20,16,40,.25)}
+.devhead,.tabs,#devPreview{margin-left:16px;margin-right:16px;flex:none}
+#devPreview{border-bottom:1.5px solid var(--line);padding-bottom:8px}
+.devscroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.devpair .stage{display:flex;justify-content:center}
+.devpair .moth{width:auto;max-width:100%;max-height:min(190px,24vh)}
+.devcmp{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.devcmp label{flex:1;min-width:160px}
+.dev[hidden]{display:none}
+.devhead{display:flex;justify-content:space-between;align-items:center}
+.tabs{display:flex;gap:6px;margin-top:10px;margin-bottom:10px;background:var(--chip);border-radius:999px;padding:4px}
+.tabs button{flex:1;border:0;background:none;border-radius:999px;padding:.4rem;font-weight:600;cursor:pointer;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink)}
+.dev label{font-size:.85rem;color:var(--muted);display:block}
+.dev select{width:100%;margin-top:3px;padding:.35rem .5rem;border-radius:10px;border:1.5px solid var(--line);background:var(--panel)}
+.devpair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
+.devpair figcaption{font-size:.8rem;color:var(--muted);text-align:center;margin-top:3px}
+.devpair figure{margin:0}
+.devscore{font-size:.95rem;margin:2px 0 0}
+.devscore strong{font-size:1.4rem}
+.devdesc{font-size:.82rem;color:var(--muted);margin:0 0 8px}
+.trow{border-top:1px solid var(--line);padding:8px 0}
+.trh{display:flex;justify-content:space-between;font-size:.88rem;font-weight:600}
+.trh output{font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.dev input[type=range]{width:100%;accent-color:var(--lantern);margin:4px 0}
+.trow details summary{font-size:.8rem;color:var(--muted);cursor:pointer}
+.arow{display:grid;grid-template-columns:52px 1fr 1fr;gap:8px;align-items:center;font-size:.78rem;color:var(--muted)}
+.wrow{display:grid;grid-template-columns:110px 1fr 34px 42px;gap:8px;align-items:center;font-size:.85rem;border-top:1px solid var(--line);padding:4px 0}
+.wrow output{font-variant-numeric:tabular-nums;text-align:right}
+.wrow .sim{color:var(--muted);font-size:.78rem;text-align:right}
+.whead{display:grid;grid-template-columns:110px 1fr 34px 42px;gap:8px;font-size:.75rem;color:var(--muted)}
+.whead span:nth-child(3),.whead span:nth-child(4){text-align:right}
+.devtools{display:flex;flex-wrap:wrap;gap:14px;margin-top:18px;border-top:1.5px solid var(--line);padding-top:12px}
+.swrow{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:0 0 10px}
+.swrow i{display:inline-block;width:22px;height:22px;border-radius:6px;vertical-align:middle;margin-left:4px;border:1.5px solid var(--line)}
+.grp{border:1.5px solid var(--line);border-radius:14px;padding:8px 10px;margin:10px 0}
+.grph{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem;margin-bottom:2px}
+.grph .gs{color:var(--lantern)}
+.wrow.imp{border-top:0;font-weight:600}
+#toast{position:fixed;left:50%;bottom:calc(var(--navh,64px) + 14px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:14px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:.65rem 1.1rem;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;max-width:90vw;text-align:center;z-index:10}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.has-undo.show{pointer-events:auto}
+#toast .undo{background:none;border:0;color:var(--lantern);font-weight:800;cursor:pointer;padding:0;text-decoration:underline}
+
+.dock-body{display:grid;grid-template-columns:150px 150px 1fr 150px;grid-template-areas:"s0 s1 act sell";gap:12px;padding:0 14px 14px}
+#slot0{grid-area:s0}#slot1{grid-area:s1}.dock-act{grid-area:act}#sellSlot{grid-area:sell}
+.dslot,.dsell{position:relative;border:2px dashed var(--line);border-radius:14px;min-height:150px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;font-size:.85rem;color:var(--muted);transition:background .12s,border-color .12s}
+.dslot.filled{border-style:solid;color:var(--ink);justify-content:flex-start;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.dslot .stage{width:100px}
+.dslot .nm{font-weight:700;font-size:.95rem}
+.dslot .meta{font-size:.78rem;color:#5b4229}
+.dslot .rm{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:var(--chip);cursor:pointer;font-weight:700;line-height:1}
+.dock-act{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:8px}
+.dock-act .btn{white-space:nowrap}
+.dock-act .note{margin:0}
+.dock-act .cost{font-size:.82rem;color:var(--muted)}
+.dsell .big{font-weight:800;font-size:1rem;color:var(--ink)}
+body.is-dragging,body.is-dragging *{cursor:grabbing !important}
+body.is-dragging{user-select:none;-webkit-user-select:none}
+body.is-dragging [data-drop]:not(.card):not(.scroll){border-color:var(--lantern)}
+body.is-dragging .order[data-drop]{outline:2px dashed var(--lantern);outline-offset:2px}
+[data-drop].over{background:color-mix(in srgb,var(--lantern) 20%,var(--panel));border-style:solid}
+.order[data-drop].over{outline-style:solid}
+.dsell.over{background:color-mix(in srgb,#c2453b 18%,var(--panel));border-color:#c2453b !important}
+.ghost{position:fixed;left:0;top:0;width:110px;pointer-events:none;z-index:60;background:var(--stage);border:1px solid var(--stage-line);border-radius:12px;padding:4px;box-shadow:0 14px 34px rgba(20,16,40,.35)}
+
+/* ---------- app shell ---------- */
+html,body{height:100%;overflow:hidden}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-width:1280px;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 16px}
+.topbar h1{white-space:nowrap;margin:0;font-size:clamp(1.15rem,4.6vw,1.5rem);font-weight:800;letter-spacing:-.03em;line-height:1;margin-right:auto;cursor:default;user-select:none;-webkit-user-select:none}
+.stats{display:flex;gap:6px}
+@media (max-width:400px){.topbar{gap:8px;padding:10px 12px}.stat{padding:.2rem .5rem .2rem .35rem}.screens{padding:0 12px 8px}}
+.stat{display:inline-flex;align-items:center;gap:5px;background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:.25rem .65rem .25rem .45rem;font-weight:800;font-variant-numeric:tabular-nums}
+.stat svg{width:18px;height:18px;flex:none}
+.stat.coin b{color:var(--lantern)}
+.iconbtn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);font-weight:800;cursor:pointer;display:grid;place-items:center;flex:none}
+.iconbtn.sm{width:30px;height:30px;font-size:1.1rem;line-height:1}
+.ci{width:14px;height:14px;vertical-align:-2px;margin:0 2px 0 1px}
+
+.screens{min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:0 16px 10px}
+.pane{min-height:0;display:flex;flex-direction:column}
+.pane.side{display:none;background:var(--panel);border:1.5px solid var(--line);border-radius:20px;padding:12px 12px 0}
+#app[data-panel="orders"] #paneOrders,#app[data-panel="garden"] #paneGarden{display:flex}
+@media (min-width:900px){#app:not([data-panel=""]) .screens{grid-template-columns:minmax(0,1fr) 370px}}
+@media (max-width:899px){#app:not([data-panel=""]) #paneStable{display:none}}
+.panehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;flex:none}
+.panehead h2{font-size:1.15rem}
+.panehead .acts{display:flex;gap:8px;align-items:center}
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 2px 12px;border-radius:14px}
+#paneStable{container-type:inline-size}
+.grid{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+
+.dock{flex:none;margin-top:10px;background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:10px}
+.dock:not(.open){display:none}
+.dock-body{display:grid;grid-template-columns:140px 140px 1fr;grid-template-areas:"s0 s1 act";gap:10px}
+.dslot,.dsell{min-height:132px}
+.dock-act{align-items:center;justify-content:center}
+.dock-act .btn{font-size:1.05rem;padding:.7rem 1.4rem}
+.dock-act .cost{font-size:.8rem;color:var(--muted)}
+@container (max-width:620px){
+  .dock-body{grid-template-columns:1fr 1fr auto;grid-template-areas:"s0 s1 act";gap:8px}
+  .dslot,.dsell{min-height:112px;font-size:.78rem}
+  .dslot .stage{width:66px}
+  .dock-act{flex-direction:column;gap:6px}
+  .dock-act .btn{padding:.55rem 1.2rem}
+}
+
+.navbar{display:flex;justify-content:center;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));border-top:1.5px solid var(--line);background:var(--panel)}
+.navbar button{position:relative;flex:1;max-width:150px;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;border-radius:14px;padding:6px 4px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer}
+.navbar button>svg{width:26px;height:26px;flex:none}
+.navbar button .ci{width:13px;height:13px;vertical-align:-1px}
+#sellLabel{line-height:1.45;display:inline-flex;align-items:center}
+#sellLabel{white-space:nowrap}
+.navbar button[aria-pressed="true"]{color:var(--ink);background:var(--chip)}
+.navbar button[data-drop]{transition:background .12s,color .12s}
+body.is-dragging .navbar button[data-drop]{color:#b13a30;background:color-mix(in srgb,#c2453b 10%,var(--panel));outline:2px dashed #c2453b;outline-offset:-2px}
+.navbar button[data-drop].over{color:#fff !important;background:#c2453b !important;outline-style:solid}
+.navbar button[data-drop].over .ci{filter:drop-shadow(0 0 1px #0004)}
+.navbar button.over{background:color-mix(in srgb,var(--lantern) 25%,var(--panel));color:var(--ink)}
+.badge{position:absolute;top:2px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--lantern);color:#1d1606;font-size:.7rem;font-weight:800;display:grid;place-items:center}
+.badge:empty{display:none}
+
+.orders{margin-top:0}
+.order .foot .linkbtn{display:inline-flex;align-items:center;gap:2px}
+.garden{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.garden .gm{display:flex;flex-direction:column;gap:6px;font-size:.9rem;background:var(--chip);border-radius:14px;padding:6px}
+.garden .nm{font-weight:700;padding:0 4px}
+.info h4{margin:14px 0 4px;font-size:1rem}
+.info ul{margin:0;padding-left:1.15rem;font-size:.92rem}
+.info li{margin:3px 0}
+
+/* ---------- rustic wood theme ---------- */
+:root{
+  --walnut:#3a2515; --walnut2:#2c1b0f; --oak:#c99d6b; --oak2:#b5874f; --frame:#5b3a1f; --frame2:#432a15;
+  --paper:#f2e3c2; --paper2:#e3cc9d; --ink:#2f2013; --muted:#6e5336; --brass:#c9922f; --brass2:#8c5d18; --barn:#9b3a2a;
+  --bg:var(--walnut); --panel:#d4ad7c; --line:#8a6440; --chip:#e8d3a8; --lantern:#a86d14; --good:#4d6b2a;
+  --body:#3a291c; --stage:var(--paper); --stage-line:#b9935f;
+  --grainH:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' stitchTiles='stitch' baseFrequency='0.0012 0.07' numOctaves='4' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.24  0 0 0 0 0.14  0 0 0 0 0.06  0 0 0 -1.6 1.15'/%3E%3C/filter%3E%3Crect width='2400' height='400' filter='url(%23f)'/%3E%3C/svg%3E"); --grainV:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='600'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' stitchTiles='stitch' baseFrequency='0.09 0.004' numOctaves='4' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 -1.7 1.2'/%3E%3C/filter%3E%3Crect width='300' height='600' filter='url(%23f)'/%3E%3C/svg%3E"); --paperTex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' stitchTiles='stitch' baseFrequency='0.8' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.32  0 0 0 0 0.15  0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
+  --wood-light:var(--grainH),linear-gradient(180deg,#d6ae7c,#c39561);
+  --wood-dark:var(--grainH),linear-gradient(180deg,#5e3d21,#46301a);
+  color-scheme:light;
+}
+body{color:var(--ink);background:
+  var(--grainV),
+  repeating-linear-gradient(90deg,transparent 0 150px,rgba(0,0,0,.45) 150px 152px,rgba(255,220,170,.05) 152px 154px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 154px,rgba(0,0,0,.08) 154px 308px,rgba(255,210,150,.04) 308px 462px),
+  linear-gradient(180deg,#4a301b,#2e1d10);background-color:var(--walnut)}
+h1,h2,h3{font-family:"IM Fell English SC", Georgia, serif;font-weight:400;letter-spacing:.01em}
+.topbar h1{color:var(--paper);font-size:clamp(1.35rem,5vw,1.9rem);text-shadow:0 2px 0 #0008}
+.stat{background:var(--paperTex),linear-gradient(#f4e6c6,#e2cb9b);border:1.5px solid var(--frame);color:var(--ink);box-shadow:0 2px 0 #0005}
+.stat.coin b{color:#8a5a12}
+.iconbtn{background:radial-gradient(circle at 35% 30%,#f0cd7a,#c9922f 55%,#8c5d18);border:1.5px solid #5e3c0c;color:#2f2013;box-shadow:0 2px 0 #0006,inset 0 1px 0 #fff7}
+#paneStable .panehead h2{color:var(--paper);text-shadow:0 1px 0 #0008}
+#paneStable .panehead small{color:#d8bf98}
+
+/* wooden panels */
+.pane.side,.dock{background:var(--wood-light);border:4px solid var(--frame);border-radius:10px;
+  box-shadow:inset 0 0 0 1px #ffe6b94d,inset 0 -3px 6px #0003,0 6px 16px #0008}
+.pane.side .panehead h2{color:var(--ink)}
+.pane.side .iconbtn.sm,.pane.side .iconbtn{width:30px;height:30px}
+
+/* moth cards: small wooden frames holding paper */
+.card{background:var(--wood-light);border:3px solid var(--frame);border-radius:8px;box-shadow:inset 0 0 0 1px #ffe6b955,0 4px 8px #0007}
+.card:hover{border-color:#7a4f2a}
+.card.sel{border-color:var(--brass);box-shadow:0 0 0 3px #e9b85299,0 4px 8px #0007}
+.card .nm{color:var(--ink)}
+.card .meta{color:#5b4229}
+.card .pin{background:linear-gradient(#e7b850,#b47c22);color:#2f2013;border:1px solid #6d4510}
+.stage{background:var(--paperTex),radial-gradient(ellipse at 50% 45%,#f6e9cc 50%,#e2c899 100%);border:1px solid #9c7646;border-radius:4px;
+  box-shadow:inset 0 0 12px #8a5f2a33}
+.card.ins-before::before,.card.ins-after::after{content:'';position:absolute;top:8px;bottom:8px;width:5px;border-radius:3px;background:var(--brass);box-shadow:0 0 0 2px #2c1b0f,0 0 10px #f0c060}
+.card.ins-before::before{left:-8px}
+.card.ins-after::after{right:-8px}
+
+/* buttons */
+.btn{background:var(--paperTex),linear-gradient(#ead6ad,#d2b47f);border:1.5px solid var(--frame);color:var(--ink);box-shadow:0 2px 0 #0005,inset 0 1px 0 #fff8}
+.btn.primary{background:linear-gradient(#f0c766,#c9922f 60%,#a8741f);border:1.5px solid #5e3c0c;color:#2a1a08;text-shadow:0 1px 0 #ffe8a6;font-weight:800}
+.btn:disabled{opacity:.55;filter:saturate(.5)}
+.linkbtn{color:#5b3d1e}
+
+/* breeding tray */
+.dslot{background:#3a251433;border:2px dashed #6b4a2a;border-radius:8px;box-shadow:inset 0 3px 8px #0004;color:#4d3720}
+.dslot.filled{background:var(--paperTex),linear-gradient(#efdcb4,#ddc293);border:2px solid var(--frame);box-shadow:0 3px 6px #0005}
+.dslot .rm{background:var(--frame);color:var(--paper)}
+.dock-act .cost{color:#4d3720;font-weight:700}
+
+/* commissions: paper notes pinned to wood */
+.order{position:relative;background:var(--paperTex),linear-gradient(#f5e8c9,#e6d0a3);border-radius:2px;padding:14px 10px 10px;box-shadow:0 4px 8px #0006;border:1px solid #b9935f}
+.order:nth-child(odd){transform:rotate(-.7deg)}
+.order:nth-child(even){transform:rotate(.6deg)}
+.order::before{content:'';position:absolute;top:-5px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e98b74,#9b3a2a 60%,#5d1e13);box-shadow:0 2px 2px #0007}
+.order .who{color:#5b4229;font-style:italic}
+.order .reward{color:#7a4c0e}
+.order .stage{border-color:#c6a271}
+.order[data-drop].over{outline:3px solid var(--brass) !important}
+.garden .gm{background:var(--paperTex),linear-gradient(#f5e8c9,#e6d0a3);border:1px solid #b9935f;border-radius:4px;box-shadow:0 3px 6px #0005}
+
+/* bottom bar: a dark plank shelf */
+.navbar{background:var(--wood-dark);border-top:4px solid var(--frame2);box-shadow:0 -4px 12px #0007}
+.navbar button{color:#e3cfa9}
+.navbar button[aria-pressed="true"]{color:#2f2013;background:var(--paperTex),linear-gradient(#efd9a9,#d9b878);box-shadow:inset 0 2px 4px #0004}
+.navbar button.over{background:#c9922f88;color:#fff}
+.badge{background:linear-gradient(#f0c766,#b47c22);color:#2a1a08;border:1px solid #5e3c0c}
+body.is-dragging .navbar button[data-drop]{color:#ffd9cf;background:#9b3a2a55;outline-color:#e07a68}
+.navbar button[data-drop].over{background:var(--barn) !important}
+
+/* dialogs: parchment in a wooden frame */
+dialog.dlg{background:var(--paperTex),linear-gradient(#f6ead0,#e9d4a8);border:6px solid var(--frame);border-radius:10px;color:var(--ink);box-shadow:0 18px 50px #000a}
+dialog.dlg::backdrop{background:#1c1006b3}
+.dlg .meta,.subnote,.legend,.bars .lb,.cmp figcaption,.score span{color:#6a4f33}
+.bar{background:#d9c293}
+.bar .mk{border-color:#f6ead0}
+.cmp select,.dev select{background:#f8eed7;border-color:#9c7646}
+.x{color:#6a4f33}
+.info h4{font-family:"IM Fell English SC", Georgia, serif;font-weight:400;font-size:1.15rem}
+
+/* testing panel */
+.dev{background:var(--paperTex),linear-gradient(#f3e5c5,#e5cf9f);border-left:6px solid var(--frame)}
+.tabs{background:#d9c293}
+.tabs button[aria-selected="true"]{background:#f8eed7}
+
+#toast{background:var(--wood-dark);color:var(--paper);border:2px solid var(--frame2)}
+#toast .undo{color:#f0c766}
+#toast span{white-space:nowrap}
+.ghost{background:var(--paperTex),radial-gradient(ellipse at 50% 45%,#f6e9cc 50%,#e2c899 100%);border:3px solid var(--frame);border-radius:6px}
+.empty{border-color:#8a6440;color:#e3cfa9}
+#stableScroll{padding:4px 9px 12px;margin:0 -9px}
+
+/* ---------- garden scene ---------- */
+@media (min-width:900px){#app[data-panel="garden"] .screens{grid-template-columns:minmax(0,1fr)}}
+#app[data-panel="garden"] #paneStable{display:none}
+.garden-pane{display:none}
+#app[data-panel="garden"] #paneGarden{display:flex}
+#paneGarden .panehead h2{color:var(--paper);text-shadow:0 1px 0 #0008}
+.tag{display:inline-flex;align-items:center;gap:3px;background:var(--paperTex),linear-gradient(#f4e6c6,#e2cb9b);border:1.5px solid var(--frame);border-radius:999px;padding:.2rem .65rem;font-weight:800;font-size:.9rem;box-shadow:0 2px 0 #0005}
+.scene{position:relative;flex:1;min-height:0;overflow:hidden;border:5px solid var(--frame);border-radius:10px;box-shadow:0 6px 18px #0009,inset 0 0 40px #0008;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;margin-bottom:6px}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(1.2px 1.2px at 12% 18%,#fff9 98%,transparent),radial-gradient(1px 1px at 27% 8%,#fff8 98%,transparent),
+  radial-gradient(1.4px 1.4px at 41% 22%,#fffa 98%,transparent),radial-gradient(1px 1px at 57% 12%,#fff7 98%,transparent),
+  radial-gradient(1.3px 1.3px at 66% 28%,#fff9 98%,transparent),radial-gradient(1px 1px at 79% 6%,#fff8 98%,transparent),
+  radial-gradient(1.2px 1.2px at 91% 20%,#fff9 98%,transparent),radial-gradient(1px 1px at 6% 34%,#fff6 98%,transparent),
+  radial-gradient(1px 1px at 35% 36%,#fff6 98%,transparent),radial-gradient(1px 1px at 87% 38%,#fff6 98%,transparent),
+  linear-gradient(180deg,#0c1328 0%,#18284a 45%,#2a3f55 75%,#2f4a48 100%)}
+.moon{position:absolute;top:9%;right:13%;width:clamp(44px,9vmin,84px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 38% 36%,#fffbe8,#efe4bd 60%,#d8c99a);box-shadow:0 0 30px 10px #f5ecc455,0 0 90px 40px #f5ecc422}
+.hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:55%}
+.grass{position:absolute;left:0;right:0;bottom:0;width:100%;height:16%;pointer-events:none}
+.prop{position:absolute;bottom:4%;transform:translateX(-50%);pointer-events:none}
+.prop svg{height:100%;width:auto;display:block;overflow:visible}
+.layer{position:absolute;inset:0}
+.visitor{position:absolute;left:0;top:0;padding:0;border:0;background:none;cursor:pointer;transform-origin:50% 41.8%;will-change:transform;-webkit-tap-highlight-color:transparent}
+.visitor .moth{filter:drop-shadow(0 6px 6px #0008)}
+.visitor.caught{pointer-events:none;transition:transform .75s cubic-bezier(.55,0,.75,.4),opacity .75s ease-in}
+.quote{position:relative;background:#fffaf0aa;border:2px solid #9c7646;border-radius:14px;padding:14px 16px 10px;margin:4px 0 6px;box-shadow:0 3px 8px #0002}
+.quote::before{content:'';position:absolute;top:-10px;left:28px;width:16px;height:16px;background:#fbf3e2;border-left:2px solid #9c7646;border-top:2px solid #9c7646;transform:rotate(45deg)}
+.quote p{margin:0;font-family:"IM Fell English SC",Georgia,serif;font-size:1.35rem;line-height:1.3;color:var(--ink)}
+.quote p b{font-family:"Alegreya Sans",sans-serif;font-weight:800;color:#7a4c0e;white-space:nowrap}
+.quote span{display:block;margin-top:6px;font-size:.88rem;color:#6a4f33;font-style:italic}
+.quote span::before{content:'— '}
+
+.freed{position:fixed;left:0;top:0;width:90px;z-index:55;pointer-events:none;transition:transform 1.8s cubic-bezier(.3,.1,.5,1),opacity 1.8s ease-in}
+.freed .moth{filter:drop-shadow(0 6px 6px #0008)}
+/* smaller cards: 3 per row on phones */
+.grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.card{padding:4px;border-width:2.5px}
+.card .nm{font-size:.95rem;margin-top:4px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta{font-size:.74rem;padding:0 4px 3px}
+.card .pin{top:8px;left:8px;font-size:.66rem;padding:.05rem .4rem}
+@media (min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:10px}}
+.parents{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:300px;margin:0 auto}
+.par{margin:0;text-align:center}
+.par figcaption{font-weight:700;font-size:.92rem;margin-top:4px}
+.par figcaption small{font-weight:400;color:#6a4f33}
+.parbtn{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;border-radius:4px}
+.stage.unknown{display:grid;place-items:center;aspect-ratio:230/220;font-family:"IM Fell English SC",Georgia,serif;font-size:3.2rem;color:#9c7646;opacity:.85}
+.dlg .sub{text-align:center;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:1.1rem;margin:4px 0 6px}
+.parents{margin-bottom:12px !important}
+.parents .stage{max-width:110px;margin:0 auto}
+.langsw{display:flex;align-items:center;gap:6px;margin:0 0 6px;flex-wrap:wrap}
+.langsw span{font-weight:700;margin-right:4px}
+.langsw button{border:1.5px solid var(--frame);background:#f8eed7;border-radius:999px;padding:.3rem .9rem;font-weight:700;cursor:pointer;color:var(--ink)}
+.langsw button[aria-pressed="true"]{background:linear-gradient(#f0c766,#c9922f 60%,#a8741f);border-color:#5e3c0c}
+
+/* layout fixes for longer (Spanish) strings */
+.topbar h1{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
+.stats,.topbar .iconbtn{flex:none}
+@media (max-width:440px){
+  .topbar{gap:6px;padding:10px 10px}
+  .topbar h1{font-size:clamp(1rem,4.6vw,1.3rem)}
+  .stats{gap:4px}
+  .stat{padding:.15rem .45rem .15rem .3rem;gap:3px;font-size:.92rem}
+  .stat svg{width:15px;height:15px}
+  .topbar .iconbtn{width:32px;height:32px}
+}
+#toast{width:max-content;max-width:calc(100vw - 32px)}
+#toast span{white-space:normal}
+.score strong{font-size:1.6rem}
+
+.navbar{overflow:hidden}
+.navbar button{min-width:0}
+.navbar button>span:not(.badge){display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:420px){
+  .navbar{gap:1px;padding-left:4px;padding-right:4px}
+  .navbar button{padding:6px 1px;font-size:.7rem;letter-spacing:-.01em}
+  .navbar button>svg{width:24px;height:24px}
+  .badge{left:calc(50% + 6px)}
+}
+html,body{max-width:100vw;overflow-x:hidden}
+#navOrders{flex:1.5}
+@media (max-width:340px){.navbar button{font-size:.66rem}}
+</style>
+</head>
+<body>
+<div class="app" id="app" data-panel="">
+<header class="topbar">
+  <h1 id="title" data-i18n="title">Moth Night</h1>
+  <div class="stats">
+    <span class="stat coin" data-i18n-title="stat.coins"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#e7b84a" stroke="#a8761a" stroke-width="1.5"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#a8761a" stroke-width="1.2"/></svg><b id="coins">0</b></span>
+    <span class="stat" data-i18n-title="stat.gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M12 7.5v3M12 10.5 6 14.5M12 10.5l6 4"/></svg><b id="gen">0</b></span>
+    <span class="stat" data-i18n-title="stat.del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></svg><b id="del">0</b></span>
+  </div>
+  <button class="iconbtn" data-act="info" data-i18n-aria="help">?</button>
+</header>
+
+<main class="screens">
+  <section class="pane" id="paneStable" data-i18n-aria="pane.moths">
+    <div class="panehead"><h2><span data-i18n="pane.moths">Moths</span> <small id="count"></small></h2></div>
+    <div class="scroll" id="stableScroll" data-drop="grid"><div id="grid" class="grid"></div></div>
+    <section id="dock" class="dock open" data-i18n-aria="nav.breeding">
+      <div class="dock-body">
+        <div class="dslot" id="slot0" data-drop="slot0"></div>
+        <div class="dslot" id="slot1" data-drop="slot1"></div>
+        <div class="dock-act">
+          <button class="btn primary" id="breedBtn" data-act="breed">Breed</button>
+        </div>
+      </div>
+    </section>
+  </section>
+  <section class="pane side" id="paneOrders" data-i18n-aria="pane.orders">
+    <div class="panehead"><h2 data-i18n="pane.orders">Commissions</h2><button class="iconbtn sm" data-act="closePanel" data-i18n-aria="closeOrders">×</button></div>
+    <div class="scroll"><div id="orders" class="orders"></div></div>
+  </section>
+  <section class="pane garden-pane" id="paneGarden" data-i18n-aria="pane.garden">
+    <div class="panehead"><h2 data-i18n="pane.garden">Garden</h2><div class="acts"><button class="iconbtn sm" data-act="closePanel" data-i18n-aria="closeGarden">×</button></div></div>
+    <div class="scene" id="gardenScene">
+      <div class="sky"></div><div class="moon"></div>
+      <svg class="hills" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 150 C120 90 260 120 380 100 S640 60 780 110 S940 120 1000 95 V300 H0Z" fill="#1d3134"/>
+        <path d="M0 210 C150 170 300 200 460 180 S760 150 1000 190 V300 H0Z" fill="#16262a"/>
+        <path d="M0 255 C200 235 420 250 620 238 S880 232 1000 245 V300 H0Z" fill="#102024"/>
+      </svg>
+      <div id="gardenProps"></div>
+      <svg class="grass" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true" id="gardenGrass"></svg>
+      <div class="layer" id="gardenLayer"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="navbar" id="navbar" data-i18n-aria="nav.aria">
+  <button data-act="nav" data-panel="" data-spring="moths" id="navMoths"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v12"/><path d="M12 10C10 4 3 3 3 8c0 3 4 4.5 9 3.5"/><path d="M12 10c2-6 9-7 9-2 0 3-4 4.5-9 3.5"/><path d="M12 13c-2 1.5-6.5 2.5-6.5 5.5 0 2 4.5.5 6.5-3"/><path d="M12 13c2 1.5 6.5 2.5 6.5 5.5 0 2-4.5.5-6.5-3"/><path d="M11 6.5 9 3.5M13 6.5l2-3"/></svg><span data-i18n="pane.moths">Moths</span></button>
+  <button data-act="nav" data-panel="orders" data-spring="orders" id="navOrders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10h7M8.5 14h7M8.5 18h4"/></svg><span data-i18n="pane.orders">Commissions</span><span class="badge" id="ordersBadge"></span></button>
+  <button data-act="nav" data-panel="garden" id="navGarden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="2"/><path d="M12 6c0-2.5 3-3 3-.5S13.5 8 12 8M12 6c0-2.5-3-3-3-.5S10.5 8 12 8M12 10c0 2.5 3 3 3 .5S13.5 8 12 8M12 10c0 2.5-3 3-3 .5S10.5 8 12 8"/><path d="M12 10v11"/><path d="M12 17c-3 0-5-2-5-4 2 0 5 1 5 4zM12 15c3 0 5-2 5-4-2 0-5 1-5 4z"/></svg><span data-i18n="pane.garden">Garden</span></button>
+  <button data-act="sellHint" data-drop="sell" id="navSell" data-i18n-aria="release.aria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.5c1.5 4 5 5.5 9 5.5s7.5-1.5 9-5.5"/><path d="M3 14.5c2.5-.8 4.5-.3 6 1.2M21 14.5c-2.5-.8-4.5-.3-6 1.2"/><path d="M12 4.5v6"/><path d="M12 6.5c-1.2-2.6-5-3-5-.6 0 1.9 2.9 2.3 5 1.4M12 6.5c1.2-2.6 5-3 5-.6 0 1.9-2.9 2.3-5 1.4"/><path d="M12 9c-1 1-3 1.6-3 3 0 1 2 .4 3-1.4M12 9c1 1 3 1.6 3 3 0 1-2 .4-3-1.4"/></svg><span id="sellLabel">Release</span></button>
+  <button data-act="dock" data-spring="breed" id="navBreed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 6.5C9.6 4.3 10.8 3 12 3c3 0 6 6 6 11a6 6 0 0 1-12 0c0-1.7.4-3.6 1-5.3"/><path d="M5 12h3l1.5-2 2 4 1.5-2H15"/></svg><span data-i18n="nav.breeding">Breeding</span><span class="badge" id="breedBadge"></span></button>
+</nav>
+</div>
+<aside id="dev" class="dev" hidden aria-label="Testing panel">
+  <div class="devhead">
+    <h2>Testing panel</h2>
+    <button class="x" data-act="devClose" aria-label="Close testing panel">×</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-act="devTab" data-tab="genes" id="tabGenes">Genes</button>
+    <button role="tab" data-act="devTab" data-tab="sim" id="tabSim">Similarity</button>
+  </div>
+  <div id="devPreview"></div>
+  <div class="devscroll">
+  <div id="devBody"></div>
+  <div class="devtools">
+    <button class="linkbtn" data-act="devCoins">Add 100 coins</button>
+    <button class="linkbtn" data-act="devOrders">New commissions</button>
+    <button class="linkbtn" data-act="devGarden">Send a garden moth</button>
+  </div>
+  </div>
+</aside>
+<dialog id="dlg" class="dlg" aria-label="Details"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const KEY='mothnight-v2', CAP=12;
+const COST={look:2,swap:3};
+const TRAITS=[
+  {k:'hue',n:4,label:'Hue'},{k:'sat',n:2,label:'Color strength'},{k:'light',n:2,label:'Lightness'},
+  {k:'accent',n:2,label:'Marking shade'},{k:'fore',n:2,label:'Forewing length'},{k:'tip',n:2,label:'Wingtip point'},
+  {k:'hind',n:2,label:'Hindwing breadth'},{k:'tail',n:3,label:'Tails'},{k:'margin',n:2,label:'Dark edges'},
+  {k:'eye',n:3,label:'Eyespots'},{k:'band',n:2,label:'Band'},{k:'bandPos',n:1,label:'Band position'},
+  {k:'speck',n:2,label:'Speckles'},{k:'feather',n:2,label:'Antenna feathers'},{k:'size',n:3,label:'Size'}];
+const W0={mainColor:3,markColor:1,fore:1,tip:1,hind:1,tail:1.5,size:1,eye:1.3,band:1,bandPos:.5,speck:.8,margin:.8,feather:.6};
+const THR={tail:.4,eye:.3,band:.3,speck:.3,margin:.3};
+const NAMES=['Pip','Ottoline','Fennel','Wren','Quill','Hazel','Bramble','Lumen','Tansy','Sorrel','Juniper','Nib','Clover','Ember','Dusk','Pollen','Thistle','Marlo','Birch','Velvet','Sable','Mote','Rook','Linden','Fable','Opal','Saffy','Gale','Cinder','Wick','Moxie','Puck','Inkcap','Larkin','Bisque','Tumble','Arlo','Sprig','Nettle','Umber'];
+const CLIENTS_UNUSED=['The lamplighter','Professor Wick at the moth museum','A night market stall','The observatory gift shop','A collector in the attic','The candle maker','A wedding planner','The botanist next door'];
+
+const COIN='<svg class="ci" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#e7b84a" stroke="#a8761a" stroke-width="1.5"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#a8761a" stroke-width="1.2"/></svg>';
+const clamp=v=>Math.max(0,Math.min(1,v));
+const thr=(v,t)=>Math.max(0,(v-t)/(1-t));
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r=Math.random){let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())}
+const pick=(a,r=Math.random)=>a[Math.floor(r()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pc=x=>Math.round(x*100)+'%';
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+let state, fresh=new Set(), uid=0, dlgState=null;
+
+/* ---------- genetics ---------- */
+function phen(g){const p={};for(const t of TRAITS){let s=0;for(const [a,b] of g[t.k])s+=a+b;p[t.k]=s/(2*t.n)}return p}
+function vis(p){const v={...p};for(const k in THR)v[k]=thr(p[k],THR[k]);return v}
+function wildGenes(push=0){
+  const g={};
+  for(const t of TRAITS){
+    let c=Math.random();
+    if(t.k==='tail')c=Math.random()**1.3;
+    c=clamp(.5+(c-.5)*(1+push));
+    g[t.k]=Array.from({length:t.n},()=>[clamp(c+gauss()*.25),clamp(c+gauss()*.25)]);
+  }
+  return g;
+}
+function newMoth(genes,gen=0){return {id:state.nextId++,name:pick(NAMES),gen,genes}}
+function child(a,b,r=Math.random){
+  let mut=false;const g={};
+  for(const t of TRAITS){
+    g[t.k]=a.genes[t.k].map((la,i)=>{
+      const al=[pick(la,r),pick(b.genes[t.k][i],r)];
+      for(let j=0;j<2;j++)if(r()<.012){al[j]=clamp(al[j]+gauss(r)*.18);mut=true}
+      return al;
+    });
+  }
+  return {genes:g,mut};
+}
+const GROUPS=[
+  {g:'color',label:'Color',items:[['mainColor','Main color'],['markColor','Marking color']]},
+  {g:'shape',label:'Wing shape and size',items:[['fore','Forewing length'],['tip','Wingtip point'],['hind','Hindwing breadth'],['tail','Tails'],['size','Size']]},
+  {g:'marks',label:'Markings',items:[['eye','Eyespots'],['band','Band'],['bandPos','Band position'],['speck','Speckles'],['margin','Dark edges']]},
+  {g:'extra',label:'Antennae',items:[['feather','Antenna feathers']]}];
+const G0={color:3,shape:1.5,marks:1.2,extra:.4};
+const defaultTuning=()=>({v:3,W:{...W0},G:{...G0},K:2,colorTol:.18,payMin:.55,payFull:.9});
+function colorsOf(p){
+  const h=p.hue*340,s=25+p.sat*65,l=32+p.light*38,ah=(h+(p.accent-.5)*160+360)%360;
+  return {main:hslArr(h,s,l),acc:hslArr(ah,Math.min(95,s+10),Math.max(16,l-24))};
+}
+function oklab([r,g,b]){
+  const lin=c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4};r=lin(r);g=lin(g);b=lin(b);
+  const l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);
+  return [.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s];
+}
+const colorDiff=(a,b)=>{const x=oklab(a),y=oklab(b);return Math.hypot(x[0]-y[0],x[1]-y[1],x[2]-y[2])};
+function matchParts(pa,pb){
+  const T=state.tuning,a=vis(pa),b=vis(pb),ca=colorsOf(pa),cb=colorsOf(pb);
+  const markVis=Math.min(1,Math.max(a.eye,b.eye,a.band,b.band,a.margin,b.margin,a.speck*.5,b.speck*.5)*1.5);
+  const simOf=k=>k==='mainColor'?Math.max(0,1-colorDiff(ca.main,cb.main)/T.colorTol)
+    :k==='markColor'?Math.max(0,1-colorDiff(ca.acc,cb.acc)/T.colorTol)
+    :Math.max(0,1-Math.abs(a[k]-b[k])*T.K);
+  const wOf=k=>T.W[k]*(k==='markColor'?markVis:k==='bandPos'?Math.max(a.band,b.band):1);
+  return GROUPS.map(G=>{
+    const items=G.items.map(([k,label])=>({k,label,w:wOf(k),sim:simOf(k)}));
+    const sw=items.reduce((t,x)=>t+x.w,0),score=sw?items.reduce((t,x)=>t+x.w*x.sim,0)/sw:1;
+    return {g:G.g,label:G.label,I:sw?T.G[G.g]:0,score,items};
+  });
+}
+function match(pa,pb){let si=0,sl=0;for(const g of matchParts(pa,pb)){si+=g.I;sl+=g.I*Math.log(Math.max(.02,g.score))}return si?Math.exp(sl/si):1}
+const payout=(o,s)=>{const T=state.tuning;return Math.round(o.reward*Math.pow(clamp((s-T.payMin)/Math.max(.01,T.payFull-T.payMin)),1.4))};
+function value(m){const v=vis(phen(m.genes));return Math.round(6+9*v.tail+5*v.eye+3*v.speck)}
+function newOrder(){
+  const push=Math.min(.6,state.deliveries*.08);
+  const target=phen(wildGenes(push)),v=vis(target);
+  const reward=Math.round(50+Math.random()*20+18*v.tail+12*v.eye+state.deliveries*3);
+  const ci=Math.floor(Math.random()*I18N.en.clients.length);
+  return {id:state.nextId++,ci,client:I18N.en.clients[ci],target,reward};
+}
+function predict(a,b){
+  const r=mulberry(a.id*7919+b.id*104729),n=240,res=state.orders.map(()=>({sum:0,hi:0}));
+  for(let i=0;i<n;i++){
+    const p=phen(child(a,b,r).genes);
+    state.orders.forEach((o,j)=>{const s=match(p,o.target);res[j].sum+=s;if(s>=.9)res[j].hi++});
+  }
+  return res.map(x=>({avg:x.sum/n,hi:x.hi/n}));
+}
+
+/* ---------- drawing ---------- */
+function mothSVG(p,seed){
+  const v=vis(p),id='m'+(uid++),f=x=>+x.toFixed(1);
+  const h=f(p.hue*340),s=f(25+p.sat*65),l=f(32+p.light*38);
+  const main=hsl3(h,s,l),lite=hsl3(h,s,Math.min(90,l+22)),dk=hsl3(h,s*.9,Math.max(12,l-26));
+  const ah=f((h+(p.accent-.5)*160+360)%360);
+  const acc=hsl3(ah,Math.min(95,s+10),Math.max(16,l-24)),pale=hsl3(ah,s,88),edge=hsl3(ah,s*.6,Math.max(10,l-36));
+  const fl=68+p.fore*34,r=1-p.tip,Tx=fl*.9,Ty=-fl*.62,Qx=fl*.52,Qy=8+r*4;
+  const fore=`M6,-14 C18,-46 ${f(Tx-22-14*r)},${f(Ty-4-10*r)} ${f(Tx)},${f(Ty)} C${f(Tx+4+16*r)},${f(Ty+16+6*r)} ${f(Qx+20+10*r)},${f(Qy-8)} ${f(Qx)},${f(Qy)} C${f(Qx-16)},${f(Qy+5)} 20,10 6,2 Z`;
+  const hw=42+p.hind*32,tl=v.tail*48;
+  let hind=`M6,4 C28,3 ${f(hw)},10 ${f(hw)},34 C${f(hw)},50 ${f(hw*.85)},58 ${f(hw*.7)},62`;
+  if(tl>1.5)hind+=` C${f(hw*.7+2)},${f(62+tl*.5)} ${f(hw*.7+3)},${f(62+tl*.85)} ${f(hw*.66)},${f(62+tl)} C${f(hw*.6)},${f(62+tl)} ${f(hw*.56)},${f(62+tl*.5)} ${f(hw*.52)},64`;
+  hind+=` C${f(hw*.34)},72 14,56 6,16 Z`;
+  const mk=f(1-v.margin*.22);
+  const fill=(d,ox,oy)=>v.margin>.02
+    ?`<path d="${d}" fill="${edge}"/><path d="${d}" fill="url(#g${id})" transform="translate(${ox} ${oy}) scale(${mk}) translate(${-ox} ${-oy})"/>`
+    :`<path d="${d}" fill="url(#g${id})"/>`;
+  const rng=mulberry(seed*2654435761%2147483647+1);
+  let fd='',hd='';
+  if(v.band>0){
+    const q=.3+p.bandPos*.5,L=[6+(Tx-6)*q,-14+(Ty+14)*q];
+    const T2=q<.6?[6+(Qx-6)*q/.6,2+(Qy-2)*q/.6]:[Qx+(Tx-Qx)*(q-.6)/.4,Qy+(Ty-Qy)*(q-.6)/.4];
+    fd+=`<path d="M${f(L[0]-6)},${f(L[1]-6)} Q${f((L[0]+T2[0])/2+8)},${f((L[1]+T2[1])/2)} ${f(T2[0]+6)},${f(T2[1]+8)}" stroke="${acc}" stroke-width="${f(3+v.band*9)}" fill="none" opacity="${f(.45+.5*v.band)}" stroke-linecap="round"/>`;
+    hd+=`<path d="M8,${f(14+q*14)} Q${f(hw*.5)},${f(20+q*16)} ${f(hw)},${f(24+q*20)}" stroke="${acc}" stroke-width="${f(2+v.band*6)}" fill="none" opacity="${f(.35+.45*v.band)}"/>`;
+  }
+  const nf=Math.round(v.speck*30),nh=Math.round(v.speck*16);
+  for(let i=0;i<30;i++){const x=8+rng()*Tx,y=Ty+rng()*(Qy-Ty+6),rr=1+rng()*1.6;if(i<nf)fd+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(rr)}" fill="${edge}" opacity=".8"/>`}
+  for(let i=0;i<16;i++){const x=8+rng()*hw,y=6+rng()*60,rr=1+rng()*1.4;if(i<nh)hd+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(rr)}" fill="${edge}" opacity=".75"/>`}
+  if(v.eye>0){
+    const R=4+v.eye*11,Fx=Tx*.6,Fy=Ty*.48,Hx=hw*.6,Hy=36,R2=R*.7;
+    fd+=`<circle cx="${f(Fx)}" cy="${f(Fy)}" r="${f(R)}" fill="${acc}"/><circle cx="${f(Fx)}" cy="${f(Fy)}" r="${f(R*.62)}" fill="${pale}"/><circle cx="${f(Fx+R*.08)}" cy="${f(Fy-R*.08)}" r="${f(R*.28)}" fill="${edge}"/>`;
+    hd+=`<circle cx="${f(Hx)}" cy="${Hy}" r="${f(R2)}" fill="${acc}"/><circle cx="${f(Hx)}" cy="${Hy}" r="${f(R2*.62)}" fill="${pale}"/><circle cx="${f(Hx)}" cy="${Hy}" r="${f(R2*.28)}" fill="${edge}"/>`;
+  }
+  const wing=`${fill(hind,6,10)}<g clip-path="url(#ch${id})">${hd}</g><path d="${hind}" fill="none" stroke="${dk}" stroke-width="1.4"/>
+    ${fill(fore,6,-6)}<g clip-path="url(#cf${id})">${fd}</g><path d="${fore}" fill="none" stroke="${dk}" stroke-width="1.4"/>`;
+  let ant='<path d="M-3,-35 C-8,-55 -16,-68 -28,-80" stroke="var(--body)" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  const tk=p.feather*7;
+  if(tk>1.2)for(let t=.3;t<=1.001;t+=.1){const x=-3-25*t,y=-35-45*t;ant+=`<path d="M${f(x-tk*.7)},${f(y+tk*.45)} L${f(x)},${f(y)} L${f(x+tk*.7)},${f(y+tk*.45)}" stroke="var(--body)" stroke-width="1.2" fill="none"/>`}
+  const sc=f(.72+p.size*.36);
+  return `<svg class="moth" viewBox="-115 -92 230 220" role="img" aria-label="Moth">
+  <defs><radialGradient id="g${id}" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100"><stop offset="0" stop-color="${lite}"/><stop offset=".55" stop-color="${main}"/><stop offset="1" stop-color="${dk}"/></radialGradient>
+  <clipPath id="cf${id}"><path d="${fore}"/></clipPath><clipPath id="ch${id}"><path d="${hind}"/></clipPath></defs>
+  <g transform="scale(${sc})"><g class="flapR">${wing}</g><g class="flapL"><g transform="scale(-1,1)">${wing}</g></g>
+  <g>${ant}</g><g transform="scale(-1,1)">${ant}</g>
+  <ellipse cx="0" cy="4" rx="7.5" ry="31" fill="var(--body)"/>
+  <path d="M-6,0 H6 M-6.5,10 H6.5 M-6,20 H6" stroke="${main}" stroke-width="2" opacity=".6"/>
+  <circle cx="0" cy="-30" r="7.5" fill="var(--body)"/></g></svg>`;
+}
+function hslArr(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),c=n=>Math.round(255*(l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1))));return [c(0),c(8),c(4)]}
+function hsl3(h,s,l){const [r,g,b]=hslArr(h,s,l);return `rgb(${r},${g},${b})`}
+function hueName(h){const n=[[12,'red'],[30,'orange'],[46,'amber'],[62,'yellow'],[85,'lime'],[145,'green'],[172,'teal'],[192,'cyan'],[222,'azure'],[250,'blue'],[280,'violet'],[312,'magenta'],[335,'pink']];for(const [l,x] of n)if(h<l)return x;return 'rose'}
+function describe(p){
+  const v=vis(p),lv=(x,a,b,c)=>x<.33?a:x>.66?c:b;
+  const color=[p.light<.3?'deep':p.light>.7?'pale':'',p.sat<.3?'dusty':p.sat>.75?'vivid':'',hueName(p.hue*340)].filter(Boolean).join(' ');
+  const marks=[];
+  if(v.eye>0)marks.push(v.eye<.4?'small eyespots':'large eyespots');
+  if(v.band>0)marks.push(v.band<.4?'a faint band':'a bold band');
+  if(v.speck>0)marks.push(v.speck<.4?'light speckling':'heavy speckling');
+  if(v.margin>0)marks.push(v.margin<.4?'thin dark edges':'wide dark edges');
+  return [['Color',cap(color)],
+    ['Wings',`${lv(p.fore,'Short','Mid-length','Long')}, ${lv(p.tip,'rounded','softly pointed','sharply pointed')} forewings with ${lv(p.hind,'narrow','medium','broad')} hindwings`],
+    ['Tails',v.tail<=0?'None':v.tail<.35?'Short':v.tail<.7?'Medium':'Long and trailing'],
+    ['Markings',marks.length?cap(marks.join(', ')):'Unmarked'],
+    ['Antennae',lv(p.feather,'Thread-like','Lightly feathered','Fully feathered')],
+    ['Size',['Tiny','Small','Medium','Large','Huge'][Math.min(4,Math.floor(p.size*5))]]];
+}
+const bar=(k,inner,th)=>`<div class="bar${k==='hue'?' hue':''}">${th!=null?`<span class="th" style="left:${pc(th)}"></span>`:''}${inner}</div>`;
+
+/* ---------- state ---------- */
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.moths)&&Array.isArray(s.orders)&&Array.isArray(s.garden))return s}catch(e){}return null}
+function newGame(){
+  state={coins:70,moths:[],orders:[],garden:[],sel:[null,null],ui:state&&state.ui||{dock:true},nextId:1,deliveries:0,bestGen:0,tuning:state&&state.tuning||defaultTuning()};
+  for(let i=0;i<4;i++)state.moths.push(newMoth(wildGenes()));
+  for(let i=0;i<3;i++)state.garden.push(newMoth(wildGenes()));
+  for(let i=0;i<3;i++)state.orders.push(newOrder());
+}
+const byId=id=>state.moths.find(m=>m.id===id);
+function toast(msg,undo){
+  const t=document.getElementById('toast');t.innerHTML='';
+  const sp=document.createElement('span');sp.textContent=msg;t.appendChild(sp);
+  if(undo){const b=document.createElement('button');b.className='undo';b.dataset.act='undoSell';b.textContent=I18N[lang()].undo;t.appendChild(b)}
+  t.classList.toggle('has-undo',!!undo);t.classList.add('show');clearTimeout(toast.t);
+  toast.t=setTimeout(()=>{t.classList.remove('show');if(undo)lastSold=null},undo?6000:2800);
+}
+function bestFor(o){let best=null;for(const m of state.moths){const s=match(phen(m.genes),o.target);if(!best||s>best.s)best={m,s}}return best}
+
+/* ---------- render ---------- */
+function render(){
+  const hatched=new Set(fresh);fresh.clear();
+  applyStatic();
+  document.getElementById('coins').textContent=state.coins;
+  document.getElementById('gen').textContent=state.bestGen;
+  document.getElementById('del').textContent=state.deliveries;
+  document.getElementById('count').textContent=`${state.moths.length}/${CAP}`;
+  const app=document.getElementById('app');app.dataset.panel=state.ui.panel||'';
+  document.getElementById('navMoths').setAttribute('aria-pressed',!state.ui.panel);
+  document.getElementById('navOrders').setAttribute('aria-pressed',state.ui.panel==='orders');
+  document.getElementById('navGarden').setAttribute('aria-pressed',state.ui.panel==='garden');
+
+  document.getElementById('grid').innerHTML=state.moths.length?state.moths.map(m=>{
+    const si=state.sel.indexOf(m.id);
+    return `<div class="card${si>=0?' sel':''}${hatched.has(m.id)?' hatch':''}" data-drag="stable" data-drop="card" data-id="${m.id}" tabindex="0" role="button" aria-label="${t('cardAria',{name:m.name,gen:m.gen,slot:si>=0?t('cardSlot',{n:si+1}):''})}">
+      ${si>=0?`<span class="pin">${t('parentN',{n:si+1})}</span>`:''}
+      <span class="stage">${mothSVG(phen(m.genes),m.id)}</span><span class="nm">${m.name}</span><span class="meta">${t('gen',{n:m.gen})}</span></div>`;
+  }).join(''):`<div class="empty">${t('empty')}</div>`;
+
+  [0,1].forEach(i=>{
+    const el=document.getElementById('slot'+i),m=byId(state.sel[i]);
+    if(!m){
+      el.className='dslot';['data-drag','data-id','data-slot'].forEach(x=>el.removeAttribute(x));
+      el.innerHTML=`<span>${t('parentN',{n:i+1})}</span>`;
+    }else{
+      el.className='dslot filled';el.dataset.drag='slot';el.dataset.id=m.id;el.dataset.slot=i;
+      el.innerHTML=`<button class="rm" data-act="unslot" data-slot="${i}" aria-label="${t('removeFromSlot',{name:m.name})}">×</button>
+        <span class="stage">${mothSVG(phen(m.genes),m.id)}</span><span class="nm">${m.name}</span><span class="meta">${t('gen',{n:m.gen})}</span>`;
+    }
+  });
+  const dock=document.getElementById('dock');
+  dock.classList.toggle('open',!!state.ui.dock);
+  document.getElementById('navBreed').setAttribute('aria-pressed',!!state.ui.dock);
+  const nsel=state.sel.filter(x=>byId(x)).length;
+  document.getElementById('breedBadge').textContent=nsel?`${nsel}/2`:'';
+  const [a,b]=state.sel.map(byId);
+  const pred=a&&b?predict(a,b):null;
+  const bb=document.getElementById('breedBtn');
+  bb.disabled=!(a&&b)||state.moths.length>=CAP;
+  bb.textContent=state.moths.length>=CAP?t('stableFull'):t('breed');
+  document.getElementById('sellLabel').textContent=t('nav.release');
+
+  let payable=0;
+  document.getElementById('orders').innerHTML=state.orders.map((o,j)=>{
+    const best=bestFor(o),bp=best?payout(o,best.s):0;if(bp)payable++;
+    return `<div class="order" data-drop="order:${o.id}"><div class="otop"><span class="stage">${mothSVG(o.target,o.id)}</span><div>
+      <div class="who">${clientName(o)}</div><div class="reward">${COIN}${o.reward}</div>
+      ${best?`<div class="best">${t('best',{name:best.m.name,pct:pc(best.s)})}${bp?` (${COIN}${bp})`:''}</div>`:''}
+      ${pred?`<div class="chance" title="${t('pairTitle')}">${t('pair',{avg:pc(pred[j].avg),hi:pred[j].hi<.005&&pred[j].hi>0?'<1%':pc(pred[j].hi)})}</div>`:''}
+      </div></div><div class="foot"><button class="linkbtn" data-act="swap" data-id="${o.id}" ${state.coins<COST.swap?'disabled':''} aria-label="${t('swapAria',{n:COST.swap})}">${t('swap')} ${COIN}${COST.swap}</button>
+      <button class="btn small primary" data-act="compare" data-id="${o.id}">${t('compare')}</button></div></div>`;
+  }).join('');
+  document.getElementById('ordersBadge').textContent=payable||'';
+  syncGarden();
+  renderDialog();
+  requestAnimationFrame(()=>{const n=document.getElementById('navbar');if(n&&n.offsetHeight)document.documentElement.style.setProperty('--navh',n.offsetHeight+'px')});
+  if(dev.open)devRefreshSelects();
+  save();
+}
+
+function renderDialog(){
+  const dlg=document.getElementById('dlg');
+  if(!dlgState){if(dlg.open)dlg.close();return}
+  let html='';dlg.classList.remove('wide');
+  if(dlgState.t==='moth'){
+    const m=byId(dlgState.id);if(!m){dlgState=null;if(dlg.open)dlg.close();return}
+    const p=phen(m.genes),picked=state.sel.includes(m.id);
+    const fits=state.orders.map(o=>({o,s:match(p,o.target)})).filter(x=>payout(x.o,x.s)>0);
+    html=`<div class="dhead"><div><h3>${m.name}</h3><div class="meta">${t('generation',{n:m.gen})}${m.gen?'':t('wild')}</div></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
+      <p class="sub">${t('parents')}</p>
+      <div class="parents">${[0,1].map(i=>{const pa=m.parents&&m.parents[i];
+        if(!pa)return `<figure class="par"><span class="stage unknown" aria-label="${t('unknownAria')}">?</span><figcaption>${t('unknown')}</figcaption></figure>`;
+        const here=byId(pa.id);
+        return `<figure class="par">${here?`<button class="parbtn" data-act="details" data-id="${pa.id}" aria-label="${t('open',{name:pa.name})}">`:''}<span class="stage">${mothSVG(phen(pa.genes),pa.id)}</span>${here?'</button>':''}<figcaption>${pa.name}${here?'':` <small>${t('gone')}</small>`}</figcaption></figure>`}).join('')}</div>
+      <div class="stage big">${mothSVG(p,m.id)}</div>
+      <div class="dacts"><button class="btn ${picked?'':'primary'}" data-act="select" data-id="${m.id}">${picked?t('removeBreed'):t('addBreed')}</button>
+      <button class="btn" data-act="sell" data-id="${m.id}">${t('release')}</button></div>`;
+  }else if(dlgState.t==='order'){
+    const o=state.orders.find(x=>x.id===dlgState.id);if(!o){dlgState=null;if(dlg.open)dlg.close();return}
+    dlg.classList.add('wide');
+    const ranked=state.moths.map(m=>({m,s:match(phen(m.genes),o.target)})).sort((x,y)=>y.s-x.s);
+    let cur=ranked.find(x=>x.m.id===dlgState.mid)||ranked[0];
+    html=`<div class="dhead"><div><h3>${clientName(o)}</h3><div class="meta">${t('paysUpTo',{n:o.reward})}</div></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
+      <div class="cmp"><figure><span class="stage">${mothSVG(o.target,o.id)}</span><figcaption>${t('want')}</figcaption></figure>
+      <figure>${cur?`<span class="stage">${mothSVG(phen(cur.m.genes),cur.m.id)}</span>
+        <select id="cmpSel" aria-label="${t('mothToCompare')}">${ranked.map(x=>`<option value="${x.m.id}" ${x.m.id===cur.m.id?'selected':''}>${x.m.name} (${pc(x.s)})</option>`).join('')}</select>`
+        :`<div class="empty">${t('noMoths')}</div>`}</figure></div>`;
+    if(cur){
+      const pay=payout(o,cur.s);
+      html+=`<div class="score"><strong>${t('match',{pct:pc(cur.s)})}</strong></div>
+      <div class="quote"><p>“${clientQuote(o,cur.m,cur.s,pay)}”</p><span>${clientName(o)}</span></div>
+      <div class="dacts"><button class="btn primary" data-act="deliver" data-id="${o.id}" data-mid="${cur.m.id}" ${pay?'':'disabled'}>${pay?t('deliverFor',{name:cur.m.name,n:pay}):t('deliver',{name:cur.m.name})}</button></div>`;
+    }
+  }else if(dlgState.t==='info'){
+    dlg.classList.add('wide');
+    html=`<div class="dhead"><div><h3>${t('help')}</h3></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
+    <div class="langsw" role="group" aria-label="${t('language')}"><span>${t('language')}</span>
+      <button data-act="lang" data-lang="en" aria-pressed="${lang()==='en'}">English</button><button data-act="lang" data-lang="es" aria-pressed="${lang()==='es'}">Español</button></div>
+    <div class="info">${t('info')({min:pc(state.tuning.payMin),full:pc(state.tuning.payFull)})}</div>
+    <div class="dacts"><button class="linkbtn" data-act="reset">${t('startOver')}</button></div>`;
+  }
+  dlg.innerHTML=html;
+  if(!dlg.open)dlg.showModal();
+}
+
+/* ---------- actions ---------- */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
+  const act=el.dataset.act,id=+el.dataset.id;
+  if(act.startsWith('dev'))return;
+  if(act==='details')dlgState={t:'moth',id};
+  else if(act==='compare')dlgState={t:'order',id};
+  else if(act==='garden')state.ui.panel='garden';
+  else if(act==='info')dlgState={t:'info'};
+  else if(act==='nav'){const pnl=el.dataset.panel;state.ui.panel=(pnl&&state.ui.panel===pnl)?'':pnl}
+  else if(act==='closePanel')state.ui.panel='';
+  else if(act==='lang'){state.ui.lang=el.dataset.lang;try{localStorage.setItem('mothnight-lang',state.ui.lang)}catch(e){}}
+  else if(act==='sellHint'){toast(t('releaseHint'));return}
+  else if(act==='close')dlgState=null;
+  else if(act==='select'){
+    const i=state.sel.indexOf(id);
+    if(i>=0)state.sel[i]=null;else{const e=state.sel.indexOf(null);state.sel[e>=0?e:1]=id;state.ui.dock=true}
+  }else if(act==='sell'){
+    sellMoth(id);
+  }else if(act==='unslot'){
+    state.sel[+el.dataset.slot]=null;
+  }else if(act==='dock'){
+    if(state.ui.panel&&window.innerWidth<900){state.ui.panel='';state.ui.dock=true}else state.ui.dock=!state.ui.dock;
+  }else if(act==='undoSell'){
+    undoSell();
+  }else if(act==='catchVisitor'){
+    catchVisitor(+el.dataset.vid);
+  }else if(act==='breed'){
+    const [a,b]=state.sel.map(byId);if(!a||!b)return;
+    const n=Math.min(CAP-state.moths.length,2+(Math.random()<.5?1:0));let mut=0;const kids=[];
+    for(let i=0;i<n;i++){const c=child(a,b);if(c.mut)mut++;const k=newMoth(c.genes,Math.max(a.gen,b.gen)+1);k.parents=[a,b].map(x=>({id:x.id,name:x.name,gen:x.gen,genes:x.genes}));kids.push(k);fresh.add(k.id)}
+    state.moths.push(...kids);state.bestGen=Math.max(state.bestGen,...kids.map(k=>k.gen));
+    toast(t('hatched',{n,names:kids.map(k=>k.name).join(', ')})+(mut?(mut===1?t('mutOne'):t('mutMany',{n:mut})):''));
+  }else if(act==='deliver'){
+    const o=state.orders.find(x=>x.id===id),m=byId(+el.dataset.mid);if(!o||!m)return;
+    const s=match(phen(m.genes),o.target),pay=payout(o,s);if(!pay)return;
+    state.coins+=pay;state.deliveries++;
+    state.moths=state.moths.filter(x=>x.id!==m.id);state.sel=state.sel.map(x=>x===m.id?null:x);
+    state.orders=state.orders.map(x=>x.id===id?newOrder():x);dlgState=null;
+    toast(t('delivered',{name:m.name,pct:pc(s),n:pay}));
+  }else if(act==='swap'){
+    if(state.coins<COST.swap)return;state.coins-=COST.swap;state.orders=state.orders.map(x=>x.id===id?newOrder():x);
+  }else if(act==='reset'){
+    if(!confirm(t('confirmReset')))return;newGame();lastSold=null;dlgState=null;dlgState=null;toast(t('newNight'));
+  }
+  render();
+});
+document.addEventListener('change',e=>{if(e.target.id==='cmpSel'&&dlgState){dlgState.mid=+e.target.value;render()}});
+const dlgEl=document.getElementById('dlg');
+dlgEl.addEventListener('click',e=>{if(e.target!==dlgEl)return;const r=dlgEl.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){dlgState=null;dlgEl.close()}});
+dlgEl.addEventListener('cancel',()=>{dlgState=null});
+
+/* ---------- wing flapping (JS-driven so it works on every browser) ---------- */
+function wingsOf(el){return [el.querySelector('.flapR'),el.querySelector('.flapL')]}
+function setFlap(w,k){
+  if(!w[0])return;const s=k.toFixed(3);
+  w[0].setAttribute('transform',`translate(6 0) scale(${s} 1) translate(-6 0)`);
+  w[1].setAttribute('transform',`translate(-6 0) scale(${s} 1) translate(6 0)`);
+}
+const flyFlap=(now,ph)=>.16+.84*(.5+.5*Math.cos(now/41+ph));
+function restFlap(now,ph){
+  const f=((now+ph*700)%4200)/4200,K=[[0,1],[.62,1],[.72,.45],[.82,1],[.88,.7],[.94,1],[1,1]];
+  for(let i=1;i<K.length;i++)if(f<=K[i][0]){const [a,va]=K[i-1],[b,vb]=K[i],t=(f-a)/(b-a),e=t*t*(3-2*t);return va+(vb-va)*e}
+  return 1;
+}
+
+/* ---------- garden scene ---------- */
+const PROPS=[{t:'lantern',left:13,h:66},{t:'flower',left:35,h:34,c:'#d9c6f0',k:'#b48fd6'},{t:'flower',left:53,h:47,c:'#f4e7c8',k:'#e3b85a'},
+  {t:'flower',left:70,h:28,c:'#f2bccb',k:'#d77c97'},{t:'flower',left:87,h:40,c:'#c9dcf2',k:'#8fb0d9'}];
+const G={vis:[],raf:0,next:0,vid:1,built:false};
+function lanternSVG(){
+  return `<svg viewBox="0 0 90 300" aria-hidden="true">
+    <defs><radialGradient id="lglow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".18"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="66" cy="92" r="95" fill="url(#lglow)"/>
+    <rect x="18" y="30" width="11" height="270" fill="#4a3020"/><rect x="18" y="30" width="3.5" height="270" fill="#6e4b2e"/>
+    <rect x="14" y="26" width="19" height="8" rx="2" fill="#3a2516"/>
+    <path d="M29 44h44v6H29z" fill="#4a3020"/><path d="M29 50l14 0-14 14z" fill="#3a2516"/>
+    <path d="M66 50v12" stroke="#22150c" stroke-width="2"/>
+    <path d="M54 72l12-10 12 10z" fill="#2e1d10"/>
+    <rect x="55" y="72" width="22" height="34" rx="2" fill="#ffd27a"/>
+    <rect x="55" y="72" width="22" height="34" rx="2" fill="none" stroke="#2e1d10" stroke-width="2.5"/>
+    <path d="M66 72v34M55 89h22" stroke="#2e1d10" stroke-width="1.6"/>
+    <ellipse cx="66" cy="92" rx="5" ry="8" fill="#fff6d6"/>
+    <rect x="53" y="106" width="26" height="5" rx="1.5" fill="#2e1d10"/>
+    <circle class="perch" cx="66" cy="64" r="1" fill="none"/></svg>`;
+}
+function flowerSVG(c,k,i){
+  const petals=[0,60,120,180,240,300].map(a=>`<ellipse cx="30" cy="14" rx="7" ry="13" fill="${c}" transform="rotate(${a+i*11} 30 27)"/>`).join('');
+  return `<svg viewBox="0 0 60 200" aria-hidden="true">
+    <path d="M30 200 C${26+i*3} 150 ${36-i*2} 90 30 30" stroke="#3f6b3c" stroke-width="3.5" fill="none"/>
+    <path d="M${30+i%2*2} 150 C${46} 136 ${54} 124 ${56} 112 C${44} 116 ${36} 128 ${30} 146Z" fill="#4b7a45"/>
+    <path d="M30 118 C14 106 8 94 6 82 C18 88 26 100 30 114Z" fill="#3f6b3c"/>
+    ${petals}<circle cx="30" cy="27" r="7.5" fill="${k}"/><circle cx="28" cy="25" r="2.5" fill="#fff6"/>
+    <circle class="perch" cx="30" cy="27" r="1" fill="none"/></svg>`;
+}
+function buildGarden(){
+  if(G.built)return;G.built=true;
+  document.getElementById('gardenProps').innerHTML=PROPS.map((p,i)=>`<div class="prop" data-i="${i}" style="left:${p.left}%;height:${p.h}%">${p.t==='lantern'?lanternSVG():flowerSVG(p.c,p.k,i)}</div>`).join('');
+  let g='';const r=mulberry(42);
+  for(let i=0;i<170;i++){const x=r()*1000,h=40+r()*80,lean=(r()-.5)*40,w=4+r()*5;
+    g+=`<path d="M${(x-w).toFixed(1)} 120 Q${(x+lean*.4).toFixed(1)} ${(120-h*.6).toFixed(1)} ${(x+lean).toFixed(1)} ${(120-h).toFixed(1)} Q${(x+lean*.3+2).toFixed(1)} ${(120-h*.5).toFixed(1)} ${(x+w).toFixed(1)} 120Z" fill="${['#1f3a2c','#24432f','#183126','#2b4d34'][i%4]}"/>`}
+  document.getElementById('gardenGrass').innerHTML=g;
+}
+const gardenOn=()=>state.ui.panel==='garden';
+function sceneBox(){const sc=document.getElementById('gardenScene');return sc?sc.getBoundingClientRect():null}
+function perchPoint(i,sr){
+  const el=document.querySelector(`.prop[data-i="${i}"] .perch`);if(!el)return [sr.width/2,sr.height/2];
+  const r=el.getBoundingClientRect();return [r.left+r.width/2-sr.left,r.top+r.height/2-sr.top];
+}
+function edgePoint(W,H){
+  const side=Math.floor(Math.random()*3);
+  if(side===0)return [-90,H*(.05+Math.random()*.5)];
+  if(side===1)return [W+90,H*(.05+Math.random()*.5)];
+  return [W*(.1+Math.random()*.8),-90];
+}
+const bez=(a,c1,c2,b,t)=>{const u=1-t;return [0,1].map(k=>u*u*u*a[k]+3*u*u*t*c1[k]+3*u*t*t*c2[k]+t*t*t*b[k])};
+const rndPt=(W,H)=>[W*(.1+Math.random()*.8),H*(.08+Math.random()*.6)];
+function spawnVisitor(){
+  const sr=sceneBox();if(!sr||!sr.width||!gardenOn())return;
+  const free=PROPS.map((_,i)=>i).filter(i=>!G.vis.some(v=>v.perch===i&&!v.leaving));if(!free.length)return;
+  const perch=pick(free),W=sr.width,H=sr.height;
+  const m=newMoth(wildGenes()),p=phen(m.genes);
+  const size=Math.min(175,Math.max(72,Math.min(W,H)*(.17+p.size*.09)));
+  const el=document.createElement('button');
+  el.className='visitor flying';el.dataset.act='catchVisitor';el.dataset.vid=G.vid;
+  el.setAttribute('aria-label',t('catchAria',{name:m.name}));
+  el.style.width=size+'px';el.innerHTML=mothSVG(p,m.id);
+  document.getElementById('gardenLayer').appendChild(el);
+  const wings=wingsOf(el);
+  const a=edgePoint(W,H);
+  const v={vid:G.vid++,m,el,perch,size,h:size*220/230,phase:'in',t0:performance.now(),dur:3000+Math.random()*2200,
+    a,c1:rndPt(W,H),c2:rndPt(W,H),x:a[0],y:a[1],ang:0,restAng:(Math.random()-.5)*26,rest:5500+Math.random()*7000,w:Math.random()*10,wings};
+  G.vis.push(v);
+}
+function placeVisitor(v,x,y){
+  const dx=x-v.x,dy=y-v.y;
+  let target=v.phase==='rest'?v.restAng:(Math.abs(dx)+Math.abs(dy)>.3?Math.atan2(dy,dx)*180/Math.PI+90:v.ang);
+  let diff=((target-v.ang+540)%360)-180;v.ang+=diff*(v.phase==='rest'?.08:.12);
+  v.x=x;v.y=y;
+  v.el.style.transform=`translate(${(x-v.size/2).toFixed(1)}px,${(y-v.h*.418).toFixed(1)}px) rotate(${v.ang.toFixed(1)}deg)`;
+}
+function gardenTick(){
+  G.raf=0;if(!gardenOn())return;
+  const now=performance.now(),sr=sceneBox();if(!sr)return;
+  if(now>G.next&&G.vis.filter(v=>!v.caught).length<3){spawnVisitor();G.next=now+3500+Math.random()*5500}
+  for(const v of [...G.vis]){
+    setFlap(v.wings,v.phase==='rest'&&!v.caught?restFlap(now,v.w):flyFlap(now,v.w));
+    if(v.caught)continue;
+    let x,y;
+    if(v.phase==='in'){
+      let t=Math.min(1,(now-v.t0)/v.dur);const b=perchPoint(v.perch,sr),e=1-Math.pow(1-t,3);
+      [x,y]=bez(v.a,v.c1,v.c2,b,e);const k=1-e;
+      x+=Math.cos(now/140+v.w)*10*k;y+=Math.sin(now/95+v.w)*12*k;
+      if(t>=1){v.phase='rest';v.t0=now;v.el.classList.replace('flying','resting')}
+    }else if(v.phase==='rest'){
+      [x,y]=perchPoint(v.perch,sr);
+      if(now-v.t0>v.rest){v.phase='out';v.leaving=true;v.t0=now;v.a=[x,y];v.b=edgePoint(sr.width,sr.height);v.c1=rndPt(sr.width,sr.height);v.c2=rndPt(sr.width,sr.height);v.dur=2600+Math.random()*1800;v.el.classList.replace('resting','flying')}
+    }else{
+      const t=Math.min(1,(now-v.t0)/v.dur),e=t*t*(3-2*t)*t;
+      [x,y]=bez(v.a,v.c1,v.c2,v.b,e);x+=Math.cos(now/140+v.w)*10*t;y+=Math.sin(now/95+v.w)*12*t;
+      if(t>=1){v.el.remove();G.vis=G.vis.filter(z=>z!==v);continue}
+    }
+    placeVisitor(v,x,y);
+  }
+  G.raf=requestAnimationFrame(gardenTick);
+}
+function syncGarden(){
+  if(gardenOn()){
+    buildGarden();
+    if(!G.raf){if(!G.vis.length)G.next=performance.now()+600;G.raf=requestAnimationFrame(gardenTick)}
+  }else if(G.vis.length||G.raf){
+    cancelAnimationFrame(G.raf);G.raf=0;G.vis.forEach(v=>v.el.remove());G.vis=[];
+  }
+}
+function catchVisitor(vid){
+  const v=G.vis.find(x=>x.vid===vid);if(!v||v.caught)return;
+  if(state.moths.length>=CAP)return toast(t('stableFullMsg'));
+  state.moths.push(v.m);fresh.add(v.m.id);v.caught=true;
+  const nr=document.getElementById('navMoths').getBoundingClientRect(),sr=sceneBox();
+  const tx=nr.left+nr.width/2-sr.left-v.size/2,ty=nr.top+nr.height/2-sr.top-v.h*.418;
+  v.el.classList.add('caught');v.el.classList.replace('resting','flying');
+  requestAnimationFrame(()=>{v.el.style.transform=`translate(${tx}px,${ty}px) rotate(0deg) scale(.2)`;v.el.style.opacity='0'});
+  setTimeout(()=>{v.el.remove();G.vis=G.vis.filter(z=>z!==v)},800);
+  toast(t('caught',{name:v.m.name}));
+}
+
+/* ---------- localization ---------- */
+const I18N={
+en:{
+  title:'Moth Night','stat.coins':'Coins','stat.gen':'Best generation','stat.del':'Commissions delivered',help:'How to play',
+  'pane.moths':'Moths','pane.orders':'Commissions','pane.garden':'Garden','nav.release':'Release','nav.letgo':'Let go','nav.breeding':'Breeding',
+  'nav.aria':'Game panels','release.aria':'Release. Drag a moth here to let it go','closeOrders':'Close commissions','closeGarden':'Close garden',
+  breed:'Breed',stableFull:'Stable full',parentN:'Parent {n}',gen:'Gen {n}',
+  empty:'Your collection is empty. Visit the garden to catch a wild moth.',
+  cardAria:'{name}, generation {gen}{slot}. Open details',cardSlot:', breeding slot {n}',removeFromSlot:'Remove {name} from slot',
+  best:'Best: {name}, {pct}',pair:'Pair: {avg}, 90%+ {hi}',pairTitle:'Typical egg from the slotted pair, and the chance of a 90% match',
+  swap:'Swap',swapAria:'Swap for a new commission, {n} coins',compare:'Compare',close:'Close',
+  generation:'Generation {n}',wild:', caught in the wild',parents:'Parents',unknown:'Unknown',unknownAria:'Unknown parent',gone:'(gone)',open:'Open {name}',
+  addBreed:'Add to breeding',removeBreed:'Remove from breeding',release:'Release',
+  paysUpTo:'Pays up to {n} coins for a perfect match',want:'What they want',noMoths:'No moths yet',mothToCompare:'Moth to compare',
+  match:'{pct} match',deliver:'Deliver {name}',deliverFor:'Deliver {name} for {n} coins',
+  releaseHint:'Drag a moth onto Release to let it go',hatched:'{n} eggs hatched: {names}',mutOne:'. One carries a mutation.',mutMany:'. {n} carry a mutation.',
+  delivered:'Delivered {name} at {pct} match for {n} coins',confirmReset:'Start a new game? Your moths and coins will be lost.',newNight:'A new night begins',
+  stableFullMsg:'Your collection is full. Release a moth to make room.',caught:'Caught {name}',flew:'{name} flew away',
+  cantBack:'Your collection is full, so it can’t come back.',cameBack:'{name} came back',undo:'Undo',catchAria:'Catch {name}',
+  language:'Language',startOver:'Start over',
+  info:p=>`<h4>The goal</h4>
+    <ul><li>Each commission shows a moth a customer wants. The closer your moth looks, the more they pay. Color matters most.</li>
+    <li>Payment starts at a ${p.min} match and reaches full price around ${p.full}.</li></ul>
+    <h4>Controls</h4>
+    <ul><li>Tap a moth to see its details.</li>
+    <li>Drag a moth to a breeding slot or a commission, or onto Release in the bottom bar to let it go. On touch screens, press and hold first.</li>
+    <li>Drag a moth between other moths to reorder your collection.</li>
+    <li>While dragging, hold over Moths, Commissions or Breeding in the bottom bar to open that screen.</li>
+    <li>Released a moth by mistake? Tap Undo on the message that appears.</li></ul>
+    <h4>Breeding</h4>
+    <ul><li>Put two moths in the slots and tap Breed. Each clutch hatches 2 or 3 eggs.</li>
+    <li>Wild moths visit the Garden now and then. Tap one to catch it and bring in traits you're missing.</li></ul>
+    <h4>How inheritance works</h4>
+    <ul><li>Each trait is shaped by one to four genes. Every gene has two copies, one from each parent, and the trait is the blend of all of them.</li>
+    <li>Eggs usually land between their parents, but siblings can differ a lot. Pairing the most extreme children pushes a trait further each generation.</li>
+    <li>Tails, eyespots, bands, speckles and dark edges only appear once their genes pass a threshold, so a moth can carry traits it doesn't show.</li>
+    <li>About one egg in three carries a small mutation.</li></ul>
+    <h4>Planning a pair</h4>
+    <ul><li>With two moths in the breeding slots, each commission shows how well a typical egg would match and the chance of a 90% match.</li></ul>`,
+  clients:['The lamplighter','Professor Wick at the moth museum','A night market stall','The observatory gift shop','A collector in the attic','The candle maker','A wedding planner','The botanist next door'],
+  quotes:{
+    none:['Not what I want, sorry.','Hmm, no. That’s not the moth I described.','I’m afraid that won’t do at all.','Sorry, that’s nothing like what I asked for.'],
+    low:['It’s not really what I had in mind, but I’ll give you {c}.','Not quite it… I suppose I could pay {c}.','Close-ish. I’ll take it for {c}, no more.'],
+    mid:['Not bad at all. I can offer {c}.','That’s getting there. I’ll pay {c} for it.','Fair enough, it’s a decent likeness. {c}?'],
+    good:['This is quite good! I’ll pay {c}.','Oh, lovely. That’s very close. {c} it is.','Now we’re talking. I’ll happily pay {c}.'],
+    great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']},
+  gripes:{color:['The color is all wrong, though.','The color isn’t quite right.'],shape:['The wings aren’t the right shape.','The wing shape is a bit off.'],
+    marks:['The markings are wrong.','The markings aren’t quite right.'],extra:['The antennae aren’t right.','The antennae are a little off.']}
+},
+es:{
+  title:'Noche de Polillas','stat.coins':'Monedas','stat.gen':'Mejor generación','stat.del':'Encargos entregados',help:'Cómo jugar',
+  'pane.moths':'Polillas','pane.orders':'Encargos','pane.garden':'Jardín','nav.release':'Liberar','nav.letgo':'Soltar','nav.breeding':'Cría',
+  'nav.aria':'Paneles del juego','release.aria':'Liberar. Arrastra una polilla aquí para soltarla','closeOrders':'Cerrar encargos','closeGarden':'Cerrar jardín',
+  breed:'Criar',stableFull:'Colección llena',parentN:'Progenitor {n}',gen:'Gen. {n}',
+  empty:'Tu colección está vacía. Visita el jardín para atrapar una polilla salvaje.',
+  cardAria:'{name}, generación {gen}{slot}. Ver detalles',cardSlot:', hueco de cría {n}',removeFromSlot:'Quitar a {name} del hueco',
+  best:'Mejor: {name}, {pct}',pair:'Pareja: {avg}, 90%+ {hi}',pairTitle:'Huevo típico de la pareja elegida y probabilidad de un 90% de coincidencia',
+  swap:'Cambiar',swapAria:'Cambiar por un encargo nuevo, {n} monedas',compare:'Comparar',close:'Cerrar',
+  generation:'Generación {n}',wild:', atrapada en libertad',parents:'Progenitores',unknown:'Desconocido',unknownAria:'Progenitor desconocido',gone:'(ya no está)',open:'Abrir a {name}',
+  addBreed:'Añadir a la cría',removeBreed:'Quitar de la cría',release:'Liberar',
+  paysUpTo:'Paga hasta {n} monedas por una coincidencia perfecta',want:'Lo que busca',noMoths:'Aún no hay polillas',mothToCompare:'Polilla para comparar',
+  match:'{pct} de coincidencia',deliver:'Entregar a {name}',deliverFor:'Entregar a {name} por {n} monedas',
+  releaseHint:'Arrastra una polilla a Liberar para soltarla',hatched:'Han nacido {n} polillas: {names}',mutOne:'. Una tiene una mutación.',mutMany:'. {n} tienen una mutación.',
+  delivered:'Has entregado a {name} ({pct}) por {n} monedas',confirmReset:'¿Empezar una partida nueva? Perderás tus polillas y monedas.',newNight:'Empieza una nueva noche',
+  stableFullMsg:'Tu colección está llena. Libera una polilla para hacer sitio.',caught:'¡Has atrapado a {name}!',flew:'{name} se ha ido volando',
+  cantBack:'Tu colección está llena, así que no puede volver.',cameBack:'{name} ha vuelto',undo:'Deshacer',catchAria:'Atrapar a {name}',
+  language:'Idioma',startOver:'Empezar de nuevo',
+  info:p=>`<h4>El objetivo</h4>
+    <ul><li>Cada encargo muestra la polilla que quiere un cliente. Cuanto más se parezca la tuya, más te paga. Lo que más importa es el color.</li>
+    <li>Empiezan a pagar a partir de un ${p.min} de coincidencia y pagan el precio completo hacia el ${p.full}.</li></ul>
+    <h4>Controles</h4>
+    <ul><li>Toca una polilla para ver sus detalles.</li>
+    <li>Arrastra una polilla a un hueco de cría o a un encargo, o a Liberar en la barra inferior para soltarla. En pantallas táctiles, mantén pulsado primero.</li>
+    <li>Arrastra una polilla entre otras para reordenar tu colección.</li>
+    <li>Mientras arrastras, mantén la polilla sobre Polillas, Encargos o Cría en la barra inferior para abrir esa pantalla.</li>
+    <li>¿Has liberado una polilla por error? Toca Deshacer en el mensaje que aparece.</li></ul>
+    <h4>Cría</h4>
+    <ul><li>Pon dos polillas en los huecos y toca Criar. Cada puesta da 2 o 3 huevos.</li>
+    <li>De vez en cuando llegan polillas salvajes al Jardín. Toca una para atraparla y conseguir rasgos que te faltan.</li></ul>
+    <h4>Cómo funciona la herencia</h4>
+    <ul><li>Cada rasgo depende de uno a cuatro genes. Cada gen tiene dos copias, una de cada progenitor, y el rasgo es la mezcla de todas.</li>
+    <li>Los huevos suelen quedar a medio camino entre sus progenitores, pero los hermanos pueden ser muy distintos. Cruzar a las crías más extremas lleva un rasgo más lejos en cada generación.</li>
+    <li>Las colas, los ocelos, las bandas, las motas y los bordes oscuros solo aparecen cuando sus genes superan un umbral, así que una polilla puede llevar rasgos que no muestra.</li>
+    <li>Aproximadamente uno de cada tres huevos tiene una pequeña mutación.</li></ul>
+    <h4>Planificar una pareja</h4>
+    <ul><li>Con dos polillas en los huecos de cría, cada encargo muestra cuánto se parecería un huevo típico y la probabilidad de lograr un 90% de coincidencia.</li></ul>`,
+  clients:['El farolero','El profesor Wick, del museo de polillas','Un puesto del mercado nocturno','La tienda de regalos del observatorio','Un coleccionista del desván','El fabricante de velas','Una organizadora de bodas','La botánica de al lado'],
+  quotes:{
+    none:['No es lo que busco, lo siento.','Mmm, no. Esa no es la polilla que describí.','Me temo que eso no me sirve.','Lo siento, no se parece en nada a lo que pedí.'],
+    low:['No es lo que tenía en mente, pero te doy {c}.','No es exactamente eso… supongo que podría pagar {c}.','Se acerca un poco. Me la quedo por {c}, ni una más.'],
+    mid:['Nada mal. Puedo ofrecerte {c}.','Va por buen camino. Te pago {c}.','Me vale, se parece bastante. ¿{c}?'],
+    good:['¡Está bastante bien! Te pago {c}.','Qué bonita, se parece mucho. {c}, trato hecho.','Así sí. Te pago {c} con gusto.'],
+    great:['¡Perfecta, justo lo que imaginaba! Aquí tienes {c}.','¡Es esta! Toma {c}, te lo has ganado.','Maravillosa, tal como la imaginé. {c} para ti.']},
+  gripes:{color:['Aunque el color está totalmente mal.','Aunque el color no es del todo correcto.'],shape:['Las alas no tienen la forma correcta.','La forma de las alas no acaba de encajar.'],
+    marks:['Las marcas están mal.','Las marcas no son del todo correctas.'],extra:['Las antenas no están bien.','Las antenas no acaban de encajar.']}
+}};
+const lang=()=>state&&state.ui&&I18N[state.ui.lang]?state.ui.lang:'en';
+function t(k,vars){let v=I18N[lang()][k];if(v==null)v=I18N.en[k];if(typeof v!=='string')return v;
+  return vars?v.replace(/\{(\w+)\}/g,(_,x)=>vars[x]!=null?vars[x]:''):v}
+function clientName(o){
+  let i=o.ci;if(i==null){i=I18N.en.clients.indexOf(o.client);if(i<0)return o.client}
+  return I18N[lang()].clients[i];
+}
+function applyStatic(){
+  document.documentElement.lang=lang();document.title=t('title');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.i18nAria))});
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{el.title=t(el.dataset.i18nTitle);el.setAttribute('aria-label',t(el.dataset.i18nTitle))});
+}
+
+/* ---------- client reactions ---------- */
+function clientQuote(o,m,s,pay){
+  const f=pay/o.reward,tier=!pay?'none':f<.25?'low':f<.55?'mid':f<.85?'good':'great';
+  const list=t('quotes')[tier],seed=(o.id*31+m.id*17)%997;
+  let q=list[seed%list.length].replace('{c}',`<b>${COIN}${pay}</b>`);
+  if(tier!=='great'){
+    const groups=matchParts(phen(m.genes),o.target).filter(g=>g.I>0).sort((a,b)=>a.score-b.score);
+    const worst=groups[0];
+    if(worst&&worst.score<.7)q+=' '+t('gripes')[worst.g][worst.score<.4?0:1];
+  }
+  return q;
+}
+
+/* ---------- selling with undo ---------- */
+let lastSold=null;
+function sellMoth(id){
+  const m=byId(id);if(!m)return;const idx=state.moths.indexOf(m);
+  lastSold={m,idx,slot:state.sel.indexOf(id)};
+  state.moths=state.moths.filter(x=>x.id!==id);state.sel=state.sel.map(x=>x===id?null:x);
+  if(dlgState&&dlgState.t==='moth'&&dlgState.id===id)dlgState=null;
+  flyAway(m);
+  toast(t('flew',{name:m.name}),true);
+}
+function flyAway(m){
+  const nb=document.getElementById('navSell').getBoundingClientRect();
+  const el=document.createElement('div');el.className='freed';el.innerHTML=mothSVG(phen(m.genes),m.id);
+  const sx=nb.left+nb.width/2-45,sy=nb.top-60;
+  el.style.transform=`translate(${sx}px,${sy}px) scale(.6)`;document.body.appendChild(el);
+  const ex=sx+(Math.random()-.5)*260,ey=-160,rot=(ex-sx)*.12;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.transform=`translate(${ex}px,${ey}px) rotate(${rot}deg) scale(.9)`;el.style.opacity='0'}));
+  const w=wingsOf(el),t0=performance.now(),ph=Math.random()*6;
+  (function loop(now){if(now-t0>1900)return;setFlap(w,flyFlap(now,ph));requestAnimationFrame(loop)})(t0);
+  setTimeout(()=>el.remove(),1900);
+}
+function undoSell(){
+  const L=lastSold;if(!L)return;lastSold=null;
+  if(state.moths.length>=CAP)return toast(t('cantBack'));
+  state.moths.splice(Math.min(L.idx,state.moths.length),0,L.m);fresh.add(L.m.id);
+  if(L.slot>=0&&state.sel[L.slot]==null)state.sel[L.slot]=L.m.id;
+  toast(t('cameBack',{name:L.m.name}));
+}
+
+/* ---------- drag and drop ---------- */
+const drag={src:null};
+function startDrag(){
+  const d=drag.src;if(!d||d.active)return;
+  d.active=true;
+  const g=document.createElement('div');g.className='ghost';
+  const st=d.el.querySelector('.stage');g.innerHTML=st?st.innerHTML:'';
+  document.body.appendChild(g);d.ghost=g;
+  d.el.classList.add('dragging');document.body.classList.add('is-dragging');
+  autoScroll();
+  moveDrag(d.x,d.y);
+}
+function springTo(pn){
+  const mobile=window.innerWidth<900;
+  if(pn==='breed'){if(mobile)state.ui.panel='';state.ui.dock=true}
+  else if(pn==='moths')state.ui.panel='';
+  else state.ui.panel=pn;
+  render();
+}
+function nearestCard(x,y){
+  let best=null,bd=1e9;
+  document.querySelectorAll('#grid .card').forEach(c=>{const r=c.getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),dd=dx*dx+dy*dy;if(dd<bd){bd=dd;best=c}});
+  return best;
+}
+function autoScroll(){
+  const d=drag.src;if(!d||!d.active)return;
+  const sc=document.getElementById('stableScroll');
+  if(d.from==='stable'&&sc&&sc.offsetParent){
+    const r=sc.getBoundingClientRect();let v=0;
+    if(d.x>r.left&&d.x<r.right){
+      if(d.y>r.top-20&&d.y<r.top+50)v=-Math.ceil((r.top+50-d.y)/6);
+      else if(d.y>r.bottom-50&&d.y<r.bottom+10)v=Math.ceil((d.y-(r.bottom-50))/6);
+    }
+    if(v){const before=sc.scrollTop;sc.scrollTop+=v;if(sc.scrollTop!==before)moveDrag(d.x,d.y)}
+  }
+  requestAnimationFrame(autoScroll);
+}
+function clearIns(){document.querySelectorAll('.ins-before,.ins-after').forEach(c=>c.classList.remove('ins-before','ins-after'))}
+function moveDrag(x,y){
+  const d=drag.src;if(!d||!d.ghost)return;
+  d.ghost.style.transform=`translate(${x-55}px,${y-(d.touch?135:125)}px) rotate(-4deg)`;
+  const hit=document.elementFromPoint(x,y);
+  let t=hit&&hit.closest('[data-drop]');
+  if(t&&(t.dataset.drop==='card'||t.dataset.drop==='grid')){
+    if(d.from!=='stable')t=t.dataset.drop==='grid'||t.dataset.drop==='card'?null:t;
+    else{
+      const c=t.dataset.drop==='card'?t:nearestCard(x,y);
+      if(!c||+c.dataset.id===d.id)t=null;
+      else{
+        const r=c.getBoundingClientRect(),after=x>r.left+r.width/2;
+        if(c!==d.insCard||after!==d.insAfter){clearIns();c.classList.add(after?'ins-after':'ins-before');d.insCard=c;d.insAfter=after}
+        t=c;
+      }
+    }
+  }
+  if(!t||t.dataset.drop!=='card'){if(d.insCard){clearIns();d.insCard=null}}
+  const sp=hit&&hit.closest('[data-spring]');
+  if(sp!==d.spring){
+    if(d.spring)d.spring.classList.remove('over');clearTimeout(d.springT);d.spring=sp;
+    if(sp){sp.classList.add('over');d.springT=setTimeout(()=>springTo(sp.dataset.spring),450)}
+  }
+  if(t!==d.over){
+    if(d.over)d.over.classList.remove('over');
+    d.over=t;if(t&&t.dataset.drop!=='card')t.classList.add('over');
+    const m=byId(d.id),lab=document.getElementById('sellLabel');
+    lab.textContent=t&&t.dataset.drop==='sell'&&m?I18N[lang()]['nav.letgo']:I18N[lang()]['nav.release'];
+  }
+}
+function endDrag(drop){
+  const d=drag.src;drag.src=null;if(!d)return;
+  clearTimeout(d.timer);
+  if(!d.active){
+    if(drop&&!d.moved)dlgState={t:'moth',id:d.id};
+    if(drop&&!d.moved)render();
+    return;
+  }
+  if(d.ghost)d.ghost.remove();
+  d.el.classList.remove('dragging');document.body.classList.remove('is-dragging');
+  if(d.over)d.over.classList.remove('over');
+  if(d.spring)d.spring.classList.remove('over');clearTimeout(d.springT);clearIns();
+  document.getElementById('sellLabel').textContent=I18N[lang()]['nav.release'];
+  const t=drop&&d.over?d.over.dataset.drop:null;
+  if(t==='card'&&d.from==='stable'){
+    const m=byId(d.id),tid=+d.over.dataset.id;
+    if(m&&tid!==d.id){
+      state.moths=state.moths.filter(x=>x.id!==d.id);
+      const idx=state.moths.findIndex(x=>x.id===tid);
+      state.moths.splice(idx+(d.insAfter?1:0),0,m);
+    }
+    render();return;
+  }
+  if(t==='slot0'||t==='slot1'){
+    const i=+t.slice(4),j=state.sel.indexOf(d.id);
+    if(j!==i){if(j>=0)state.sel[j]=state.sel[i];state.sel[i]=d.id}
+    state.ui.dock=true;
+  }else if(t==='sell'){
+    sellMoth(d.id);
+  }else if(t&&t.startsWith('order:')){
+    dlgState={t:'order',id:+t.slice(6),mid:d.id};
+  }else if(d.from==='slot'&&drop&&d.moved){
+    state.sel[d.slot]=null;
+  }else if(drop&&!d.moved){
+    dlgState={t:'moth',id:d.id};
+  }
+  render();
+}
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  if(drag.src)return;
+  const el=e.target.closest('[data-drag]');if(!el)return;
+  if(e.target.closest('button,select,input,a'))return;
+  const touch=e.pointerType!=='mouse';
+  drag.src={id:+el.dataset.id,el,from:el.dataset.drag,slot:el.dataset.slot!=null?+el.dataset.slot:null,
+    x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,touch,active:false,moved:false};
+  if(touch)drag.src.timer=setTimeout(()=>{if(drag.src&&!drag.src.moved){startDrag();if(navigator.vibrate)navigator.vibrate(12)}},280);
+  else e.preventDefault();
+});
+document.addEventListener('pointermove',e=>{
+  const d=drag.src;if(!d)return;
+  d.x=e.clientX;d.y=e.clientY;
+  const dist=Math.hypot(d.x-d.sx,d.y-d.sy);
+  if(!d.active){
+    if(dist>8){d.moved=true;if(d.touch){clearTimeout(d.timer);drag.src=null}else startDrag()}
+    return;
+  }
+  if(dist>8)d.moved=true;
+  moveDrag(d.x,d.y);
+});
+document.addEventListener('pointerup',()=>endDrag(true));
+document.addEventListener('pointercancel',()=>endDrag(false));
+document.addEventListener('touchmove',e=>{if(drag.src&&drag.src.active)e.preventDefault()},{passive:false});
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-drag]'))e.preventDefault()});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const el=e.target.closest&&e.target.closest('.card[data-drag]');if(!el)return;
+  e.preventDefault();dlgState={t:'moth',id:+el.dataset.id};render();
+});
+
+/* ---------- secret testing panel ---------- */
+const dev={open:false,tab:'genes',genes:null,srcId:null,tgtId:null};
+const clone=g=>JSON.parse(JSON.stringify(g));
+let rTimer=null;
+const scheduleRender=()=>{clearTimeout(rTimer);rTimer=setTimeout(render,150)};
+function devOpen(){
+  dev.open=true;
+  if(!dev.genes){const m=byId(state.sel[0])||state.moths[0];dev.srcId=m?m.id:null;dev.genes=m?clone(m.genes):wildGenes()}
+  document.getElementById('dev').hidden=false;devBuild();
+}
+function devClose(){dev.open=false;document.getElementById('dev').hidden=true}
+function devTarget(){return state.orders.find(o=>o.id===dev.tgtId)||state.orders[0]}
+function pairBlock(){
+  const o=devTarget();
+  return `<div class="devpair"><figure><span class="stage" id="devStage"></span><figcaption>Test moth</figcaption></figure>
+    <figure><span class="stage" id="devTgtStage"></span><figcaption>Commission picture</figcaption></figure></div>
+    <div class="devcmp"><label>Compare with <select id="devTgt">${state.orders.map(x=>`<option value="${x.id}" ${o&&x.id===o.id?'selected':''}>${x.client}</option>`).join('')}</select></label>
+    <div class="devscore" id="devScore"></div></div>`;
+}
+function devBuild(){
+  document.getElementById('tabGenes').setAttribute('aria-selected',dev.tab==='genes');
+  document.getElementById('tabSim').setAttribute('aria-selected',dev.tab==='sim');
+  const box=document.getElementById('devBody'),T=state.tuning;
+  document.getElementById('devPreview').innerHTML=pairBlock();
+  if(dev.tab==='genes'){
+    const src=byId(dev.srcId);
+    box.innerHTML=`<label>Start from <select id="devSrc"><option value="">A random wild moth</option>${state.moths.map(m=>`<option value="${m.id}" ${m.id===dev.srcId?'selected':''}>${m.name} (gen ${m.gen})</option>`).join('')}</select></label>
+      <p class="devdesc" id="devDesc" style="margin-top:8px"></p>
+      <div class="dacts" style="margin-top:4px">
+        <button class="btn small primary" data-act="devAdd">Add to stable</button>
+        ${src?`<button class="btn small" data-act="devOverwrite">Overwrite ${src.name}</button>`:''}
+        <button class="btn small" data-act="devSetTarget">Use as commission picture</button>
+        <button class="btn small" data-act="devRandom">Randomize</button>
+      </div>
+      <p class="subnote" style="margin-top:12px">The top slider sets every copy of a trait's genes at once. Open a trait to adjust each copy separately.</p>
+      ${TRAITS.map(t=>`<div class="trow"><div class="trh"><span>${t.label}</span><output id="dv_${t.k}"></output></div>
+        <input type="range" min="0" max="1" step="0.01" data-dev="master" data-k="${t.k}" aria-label="${t.label}, all copies">
+        <details><summary>${t.n} gene${t.n>1?'s':''}, ${t.n*2} copies</summary>
+        ${dev.genes[t.k].map((pair,i)=>`<div class="arow"><span>Gene ${i+1}</span>${pair.map((v,j)=>`<input type="range" min="0" max="1" step="0.01" data-dev="al" data-k="${t.k}" data-i="${i}" data-j="${j}" aria-label="${t.label} gene ${i+1} copy ${j+1}">`).join('')}</div>`).join('')}
+        </details></div>`).join('')}`;
+  }else{
+    box.innerHTML=`
+      <p class="subnote" style="margin-top:8px">Traits are scored within four groups, then the groups are multiplied together. A poor score in an important group pulls the whole match down, however well everything else fits. Importance sets how hard each group pulls. Weights set how much each trait counts inside its group.</p>
+      ${GROUPS.map(G=>`<div class="grp"><div class="grph"><span>${G.label}</span><span class="gs" id="gs_${G.g}"></span></div>
+        <div class="wrow imp"><span>Importance</span><input type="range" min="0" max="5" step="0.1" value="${T.G[G.g]}" data-dev="gi" data-k="${G.g}" aria-label="${G.label} importance"><output id="gv_${G.g}">${T.G[G.g].toFixed(1)}</output><span></span></div>
+        ${G.items.map(([k,label])=>`<div class="wrow"><span>${label}</span><input type="range" min="0" max="3" step="0.1" value="${T.W[k]}" data-dev="w" data-k="${k}" aria-label="${label} weight"><output id="wv_${k}">${T.W[k].toFixed(1)}</output><span class="sim" id="ws_${k}"></span></div>`).join('')}
+      </div>`).join('')}
+      <p class="sub">Scoring</p>
+      <div class="trow"><div class="trh"><span>Color tolerance</span><output id="tv_colorTol"></output></div>
+        <input type="range" min="0.05" max="0.5" step="0.01" value="${T.colorTol}" data-dev="colorTol" aria-label="Color tolerance">
+        <p class="subnote">How different two colors can look before their match drops to zero. Lower is stricter.</p></div>
+      <div class="trow"><div class="trh"><span>Sharpness</span><output id="tv_K"></output></div>
+        <input type="range" min="1" max="5" step="0.1" value="${T.K}" data-dev="K" aria-label="Sharpness">
+        <p class="subnote">How fast shape and marking traits stop matching as they differ. At 2, a trait that's half the scale off scores zero.</p></div>
+      <div class="trow"><div class="trh"><span>Payment starts at</span><output id="tv_payMin"></output></div>
+        <input type="range" min="0.2" max="0.9" step="0.01" value="${T.payMin}" data-dev="payMin" aria-label="Payment starts at"></div>
+      <div class="trow"><div class="trh"><span>Full payment at</span><output id="tv_payFull"></output></div>
+        <input type="range" min="0.3" max="1" step="0.01" value="${T.payFull}" data-dev="payFull" aria-label="Full payment at"></div>
+      <div class="dacts"><button class="btn small" data-act="devResetTune">Reset to defaults</button></div>`;
+  }
+  devUpdate();
+}
+function devUpdate(){
+  const p=phen(dev.genes),o=devTarget(),T=state.tuning;
+  const st=document.getElementById('devStage');if(st)st.innerHTML=mothSVG(p,dev.srcId||7);
+  const ts=document.getElementById('devTgtStage');if(ts)ts.innerHTML=o?mothSVG(o.target,o.id):'';
+  const sc=document.getElementById('devScore');
+  if(sc&&o){const s=match(p,o.target),pay=payout(o,s);sc.innerHTML=`<strong>${pc(s)}</strong> match, ${pay?`pays ${pay} of ${o.reward} coins`:'pays nothing'}`}
+  const d=document.getElementById('devDesc');if(d)d.textContent=describe(p).map(([k,v])=>`${k}: ${v}`).join('. ')+'.';
+  if(dev.tab==='genes'){
+    for(const t of TRAITS){
+      const out=document.getElementById('dv_'+t.k);if(!out)continue;
+      out.textContent=p[t.k].toFixed(2)+(THR[t.k]!=null?(p[t.k]>THR[t.k]?', showing':`, shows above ${THR[t.k]}`):'');
+      const m=document.querySelector(`[data-dev="master"][data-k="${t.k}"]`);if(m&&document.activeElement!==m)m.value=p[t.k];
+      dev.genes[t.k].forEach((pair,i)=>pair.forEach((v,j)=>{const el=document.querySelector(`[data-dev="al"][data-k="${t.k}"][data-i="${i}"][data-j="${j}"]`);if(el&&document.activeElement!==el)el.value=v}));
+    }
+  }else{
+    const groups=o?matchParts(p,o.target):[];
+    for(const g of groups){
+      const gs=document.getElementById('gs_'+g.g);if(gs)gs.textContent=g.I>0?pc(g.score):'not counted';
+      for(const x of g.items){const el=document.getElementById('ws_'+x.k);if(el)el.textContent=x.w>0?pc(x.sim):'off'}
+    }
+    for(const k of ['K','colorTol','payMin','payFull']){const el=document.getElementById('tv_'+k);if(el)el.textContent=k==='K'?T.K.toFixed(1):k==='colorTol'?T.colorTol.toFixed(2):pc(T[k])}
+  }
+}
+function devRefreshSelects(){
+  const src=document.getElementById('devSrc');
+  if(src&&document.activeElement!==src)src.innerHTML=`<option value="">A random wild moth</option>${state.moths.map(m=>`<option value="${m.id}" ${m.id===dev.srcId?'selected':''}>${m.name} (gen ${m.gen})</option>`).join('')}`;
+  const tg=document.getElementById('devTgt'),o=devTarget();
+  if(tg&&document.activeElement!==tg)tg.innerHTML=state.orders.map(x=>`<option value="${x.id}" ${o&&x.id===o.id?'selected':''}>${x.client}</option>`).join('');
+  devUpdate();
+}
+document.addEventListener('input',e=>{
+  const el=e.target,kind=el.dataset&&el.dataset.dev;if(!kind)return;
+  const v=+el.value,k=el.dataset.k,T=state.tuning;
+  if(kind==='master'){dev.genes[k]=dev.genes[k].map(()=>[v,v])}
+  else if(kind==='al'){dev.genes[k][+el.dataset.i][+el.dataset.j]=v}
+  else if(kind==='w'){T.W[k]=v;document.getElementById('wv_'+k).textContent=v.toFixed(1);scheduleRender()}
+  else if(kind==='K'){T.K=v;scheduleRender()}
+  else if(kind==='gi'){T.G[k]=v;document.getElementById('gv_'+k).textContent=v.toFixed(1);scheduleRender()}
+  else if(kind==='colorTol'){T.colorTol=v;scheduleRender()}
+  else if(kind==='payMin'){T.payMin=Math.min(v,T.payFull-.05);scheduleRender()}
+  else if(kind==='payFull'){T.payFull=Math.max(v,T.payMin+.05);scheduleRender()}
+  devUpdate();
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='devSrc'){const m=byId(+e.target.value);dev.srcId=m?m.id:null;dev.genes=m?clone(m.genes):wildGenes();devBuild()}
+  if(e.target.id==='devTgt'){dev.tgtId=+e.target.value;devUpdate()}
+  if(e.target.dataset&&e.target.dataset.dev)save();
+});
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
+  const act=el.dataset.act;if(!act.startsWith('dev'))return;
+  if(act==='devClose')return devClose();
+  if(act==='devTab'){dev.tab=el.dataset.tab;return devBuild()}
+  if(act==='devRandom'){dev.genes=wildGenes();dev.srcId=null;devBuild();return}
+  if(act==='devAdd'){
+    if(state.moths.length>=CAP)return toast(t('stableFullMsg'));
+    const m=newMoth(clone(dev.genes));state.moths.push(m);fresh.add(m.id);dev.srcId=m.id;toast(`${m.name} was added to your stable`);
+  }
+  if(act==='devOverwrite'){const m=byId(dev.srcId);if(m){m.genes=clone(dev.genes);toast(`${m.name}'s genes were rewritten`)}}
+  if(act==='devSetTarget'){const o=devTarget();if(o){o.target=phen(dev.genes);toast(`${clientName(o)} now wants this moth`)}}
+  if(act==='devResetTune'){state.tuning=defaultTuning();toast('Similarity settings reset')}
+  if(act==='devCoins')state.coins+=100;
+  if(act==='devOrders'){state.orders=[0,1,2].map(newOrder);dev.tgtId=null}
+  if(act==='devGarden'){if(state.ui.panel!=='garden'){state.ui.panel='garden';render()}setTimeout(spawnVisitor,50)}
+  render();devBuild();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='`'&&e.key!=='~')return;
+  const tag=(e.target.tagName||'').toLowerCase();if(tag==='input'&&e.target.type==='text')return;
+  e.preventDefault();dev.open?devClose():devOpen();
+});
+let taps=[];
+document.getElementById('title').addEventListener('click',()=>{
+  const now=Date.now();taps=taps.filter(t=>now-t<2000);taps.push(now);
+  if(taps.length>=5){taps=[];dev.open?devClose():devOpen()}
+});
+
+state=load();if(!state)newGame();
+if(!state.tuning||state.tuning.v!==3)state.tuning=defaultTuning();
+if(!state.ui)state.ui={dock:true};
+if(!state.ui.lang){let l=null;try{l=localStorage.getItem('mothnight-lang')}catch(e){}state.ui.lang=l||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en')}
+if(state.ui.panel===undefined)state.ui.panel=window.innerWidth>=900?'orders':'';
+state.sel=[0,1].map(i=>state.sel&&byId(state.sel[i])?state.sel[i]:null);
+render();
+</script>
+</body>
+</html>
