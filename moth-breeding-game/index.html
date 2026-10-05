@@ -445,15 +445,174 @@ html[data-font="print"]{--f-display:"IM Fell English SC",Georgia,serif;--fw-disp
 body.is-dragging .boxarrow{outline:2px dashed var(--brass);outline-offset:2px}
 .boxtab small{color:#3a2614 !important;opacity:.8 !important;font-weight:700}
 .boxtab[aria-selected="true"] small{color:#4a331c !important;opacity:1 !important}
+
+/* ---------- release mode ---------- */
+.relbar{display:none;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px}
+.relbar.open{display:flex}
+.relcount{font-weight:800;color:var(--ink)}
+.relacts{display:flex;align-items:center;gap:14px}
+.btn.danger{background:linear-gradient(#c8563f,#9b3a2a 60%,#7a2a1d);border:1.5px solid #4d160d;color:#fff3e6;text-shadow:0 1px 0 #0006;font-weight:800}
+.btn.danger:disabled{filter:saturate(.4);opacity:.55}
+.navbar button#navSell[aria-pressed="true"]{color:#fff3e6;background:linear-gradient(#b4483a,#8a3023);box-shadow:inset 0 2px 4px #0005}
+.card .rchk{position:absolute;top:9px;right:9px;z-index:1;width:24px;height:24px;border-radius:50%;border:2px solid #fff8;background:#0003;box-shadow:0 1px 3px #0006}
+.card.rsel{border-color:#b4483a;box-shadow:0 0 0 3px #c2453b88,0 4px 8px #0007}
+.card.rsel .rchk{background:#b4483a;border-color:#fff3e6}
+.card.rsel .rchk::after{content:'';position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.card.rsel .stage{opacity:.75}
+
+/* keep the release bar still while the count changes */
+.relbar{min-height:66px;height:66px;padding:0 14px}
+.relcount{flex:1 1 auto;min-width:0;line-height:1.2;font-variant-numeric:tabular-nums;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.relacts{flex:none}
+#relBtn{min-width:9.2em;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.order[data-act="compare"]{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.order[data-act="compare"]:hover{box-shadow:0 7px 14px #0007}
+.order[data-act="compare"]:active{transform:scale(.985)}
+.order .foot{justify-content:flex-end;margin-top:4px}
+.sr-only{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.topbar .stats{margin-right:auto}
+.stat.coin{cursor:default;user-select:none;-webkit-user-select:none}
+
+/* compact cards: name on the paper, no generation */
+.stage.named{display:flex;flex-direction:column;align-items:center;padding:2px 3px 4px}
+.stage.named .moth{margin-bottom:-6%}
+.stage.named .nm{display:block;width:100%;margin:0;padding:0 2px;text-align:center;font-weight:800;font-size:.86rem;line-height:1.15;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
+.card{padding:4px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+@media (min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}}
+.card .pin{top:7px;left:7px}
+.card .rchk{top:7px;right:7px;width:22px;height:22px}
+.card.rsel .rchk::after{left:6px;top:2px}
+.dslot.filled .stage.named{width:100px}
+@container (max-width:620px){.dslot.filled .stage.named{width:74px}}
+.dslot.filled{justify-content:center}
+
+/* ---------- specimen drawer: tabs attached to the moth list ---------- */
+.boxhead{margin:0 0 -4px;position:relative;z-index:3;align-items:flex-end}
+.boxwrap{align-items:flex-end}
+.boxbar{padding:4px 2px 0;gap:4px;align-items:flex-end}
+.boxtab{border:3px solid var(--frame);border-bottom-width:4px;border-radius:9px 9px 0 0;padding:.32rem .8rem .38rem;box-shadow:none;
+  background:var(--wood-light);filter:brightness(.82)}
+.boxtab[aria-selected="true"]{filter:none;background:var(--paperTex),linear-gradient(#f3e5c4,#efdfbb);border-color:var(--frame);border-bottom-color:transparent;
+  box-shadow:none;padding-bottom:.5rem;margin-bottom:0}
+.boxtab[aria-selected="true"] small{color:#6a4f33 !important}
+.boxtab.add{filter:none;background:#2c1b0f88;border-color:#6b4a2a;border-style:dashed;border-bottom-style:solid;border-bottom-color:var(--frame)}
+.boxtab.over{filter:none}
+.boxarrow{margin-top:-13px}
+#stableScroll{margin:0;padding:12px 12px 14px;border:4px solid var(--frame);border-radius:0 10px 10px 10px;
+  background:var(--paperTex),linear-gradient(180deg,#efdfbb,#e6d2a7);
+  box-shadow:inset 0 3px 10px #6b4a2a55,inset 0 0 0 1px #fff3,0 6px 16px #0008}
+/* moths sit directly on the lining: no card frames */
+.card{background:none !important;border:0 !important;box-shadow:none !important;padding:4px 2px 2px;border-radius:12px;transition:background .12s}
+.card:hover{background:#7a4f2a14 !important}
+.card .stage,.card .stage.named{background:none;border:0;box-shadow:none;padding:0}
+.card .stage.named .nm{color:var(--ink);font-size:.86rem}
+.card.sel{background:radial-gradient(ellipse at 50% 45%,#f0c76655,#f0c76622 70%) !important;box-shadow:inset 0 0 0 2px #c9922f !important}
+.card.rsel{background:#c2453b1f !important;box-shadow:inset 0 0 0 2px #b4483a !important}
+.card.rsel .stage{opacity:.8}
+.card .rchk{border-color:#9c7646;background:#fff8}
+.grid .empty{color:#6a4f33;border-color:#b9935f}
+.ghost{background:none !important;border:0 !important;box-shadow:none !important;padding:0 !important;border-radius:0 !important;width:120px}
+.ghost .moth{filter:drop-shadow(0 10px 8px #0007) drop-shadow(0 2px 2px #0005)}
+
+/* breeding tray: parent | Breed | parent, slots are the moth card itself */
+.dock-body{grid-template-columns:minmax(104px,150px) auto minmax(104px,150px) !important;grid-template-areas:"s0 act s1" !important;justify-content:center;align-items:stretch;gap:14px !important}
+@container (max-width:620px){.dock-body{grid-template-columns:minmax(96px,1fr) auto minmax(96px,1fr) !important;gap:10px !important}}
+.dock-act{flex-direction:column !important;align-items:center !important;justify-content:center !important}
+.dslot.filled{padding:6px 6px 4px;background:var(--paperTex),radial-gradient(ellipse at 50% 42%,#f6e9cc 45%,#e4cc9e 100%)}
+.dslot.filled .stage.named{width:100% !important;max-width:118px;background:none !important;border:0 !important;box-shadow:none !important;padding:0 !important}
+.dslot.filled .stage.named .nm{color:var(--ink);font-size:.88rem}
+.dslot .rm{top:-9px;right:-9px;width:24px;height:24px;z-index:2;box-shadow:0 2px 3px #0006}
+
+/* fixed-size breeding slots: same size empty or filled */
+.dock-body{grid-template-columns:140px 116px 140px !important}
+.dslot{height:150px;min-height:0 !important;box-sizing:border-box}
+.dslot.filled .stage.named{height:100%;max-width:none !important;display:flex;flex-direction:column;align-items:center}
+.dslot.filled .stage.named .moth{flex:1 1 0;min-height:0;width:100%;height:auto;margin:0}
+.dslot.filled .stage.named .nm{flex:none}
+.dock-act .btn{max-width:100%;white-space:normal;line-height:1.1;text-align:center}
+@container (max-width:620px){
+  .dock-body{grid-template-columns:minmax(0,1fr) 104px minmax(0,1fr) !important}
+  .dslot{height:124px}
+  .dock-act .btn{font-size:.95rem;padding:.55rem .8rem}
+}
+.dock-body{padding:0 !important}
+@container (max-width:620px){
+  .dock-body{grid-template-columns:minmax(0,1fr) 86px minmax(0,1fr) !important;gap:8px !important}
+  .dock-act .btn{font-size:.92rem;padding:.5rem .6rem}
+}
+
+/* all tabs attach to the drawer: no bottom edge, darker parchment when inactive */
+.boxtab{filter:none !important;border-bottom-color:transparent !important;
+  background:var(--paperTex),linear-gradient(180deg,#c9ad7b 0%,#d8c08f 55%,#e6d2a7 100%) !important;color:#3a2614}
+.boxtab:not([aria-selected="true"]){padding-top:.26rem;margin-top:5px;box-shadow:inset 0 6px 8px -6px #0005}
+.boxtab:not([aria-selected="true"]):hover{background:var(--paperTex),linear-gradient(180deg,#d4b886 0%,#e0c99b 55%,#e8d5ab 100%) !important}
+.boxtab[aria-selected="true"]{background:var(--paperTex),linear-gradient(#f3e5c4,#efdfbb) !important}
+.boxtab.add{background:linear-gradient(180deg,#3a251699,#c9ad7b55 100%) !important;color:var(--paper);border-style:dashed;border-bottom-color:transparent !important}
+.boxtab.over{background:linear-gradient(#f0c766,#e6d2a7) !important}
+.boxtab{background-origin:border-box !important}
+.boxtab:not([aria-selected="true"]):not(.add){background:var(--paperTex),linear-gradient(180deg,#c9ad7b 0%,#dcc597 60%,#ecdab2 100%) !important}
+.boxtab[aria-selected="true"]{background:var(--paperTex),linear-gradient(#f3e5c4,#efdfbb) !important;background-origin:border-box !important}
+.boxtab:not([aria-selected="true"]):not(.add){background:var(--paperTex) border-box,linear-gradient(180deg,#c9ad7b 0%,#dcc597 60%,#ecdab2 100%) border-box !important}
+.boxtab:not([aria-selected="true"]):not(.add):hover{background:var(--paperTex) border-box,linear-gradient(180deg,#d4b886 0%,#e2cb9e 60%,#eedcb5 100%) border-box !important}
+.boxtab[aria-selected="true"]{background:var(--paperTex) border-box,linear-gradient(#f3e5c4,#efdfbb) border-box !important}
+.boxbar{padding-left:0 !important;padding-right:0 !important}
+.boxtab{border-width:4px !important;border-bottom-width:4px !important}
+#stableScroll{box-shadow:inset 4px 0 8px -6px #6b4a2a55,inset -4px 0 8px -6px #6b4a2a55,inset 0 -4px 10px -6px #6b4a2a55,0 6px 16px #0008 !important;
+  background:var(--paperTex),linear-gradient(180deg,#efdfbb 0,#efdfbb 40px,#e6d2a7 100%) !important}
+.boxtab[aria-selected="true"]{background:var(--paperTex) border-box,#efdfbb border-box !important}
+.boxtab{border-bottom-width:0 !important;padding-bottom:calc(.38rem + 4px) !important}
+.boxtab[aria-selected="true"]{padding-bottom:calc(.5rem + 4px) !important}
+
+/* active tab = same surface as the drawer; inactive tabs sit behind it */
+#stableScroll{box-shadow:inset 0 -4px 10px -6px #6b4a2a55,0 6px 16px #0008 !important;
+  background:var(--paperTex) fixed,linear-gradient(180deg,#efdfbb 0,#efdfbb 60px,#e8d5ac 100%) !important}
+.boxtab[aria-selected="true"]{background:var(--paperTex) fixed,#efdfbb !important;background-origin:border-box !important}
+.boxtab:not([aria-selected="true"]):not(.add){margin-bottom:4px !important;padding-bottom:.38rem !important;
+  background:var(--paperTex) border-box,linear-gradient(180deg,#d2b682,#c4a670) border-box !important;
+  box-shadow:inset 0 -7px 8px -6px #3a251466 !important;color:#3a2614}
+.boxtab:not([aria-selected="true"]):not(.add):hover{background:var(--paperTex) border-box,linear-gradient(180deg,#dcc192,#cfb27e) border-box !important}
+.boxtab.add{margin-bottom:4px !important;padding-bottom:.38rem !important;background:#2c1b0f99 !important;border-bottom:0}
+.boxtab:not([aria-selected="true"]):not(.add){margin-bottom:0 !important;padding-bottom:calc(.38rem + 4px) !important;box-shadow:none !important;
+  background:var(--paperTex) border-box,linear-gradient(180deg,#d4b886,#c7a874) border-box !important}
+.boxtab:not([aria-selected="true"]):not(.add):hover{background:var(--paperTex) border-box,linear-gradient(180deg,#dec495,#d0b380) border-box !important}
+.boxtab.add{margin-bottom:0 !important;padding-bottom:calc(.38rem + 4px) !important}
+.navbar button#navSell[aria-pressed="true"]{color:#2f2013 !important;background:var(--paperTex),linear-gradient(#efd9a9,#d9b878) !important;box-shadow:inset 0 2px 4px #0004 !important}
+@container (max-width:620px){#relBtn{min-width:7.4em;padding:.55rem .8rem}.relacts{gap:10px}.relcount{font-size:.92rem}}
+@media (max-width:340px){.relcount{font-size:.82rem !important;-webkit-line-clamp:3 !important;line-height:1.1 !important}#relBtn{min-width:6.8em;padding:.5rem .6rem}}
+.dock-act{padding:0 !important}
+.dock-act .btn{width:100%;min-height:58px;font-size:1.2rem !important;padding:.7rem .4rem !important;border-radius:16px}
+@container (max-width:620px){.dock-act .btn{min-height:54px;font-size:1.06rem !important;padding:.6rem .3rem !important}}
+
+/* bigger close/remove buttons with comfortable touch targets */
+.x{position:relative;width:40px;height:40px;display:grid;place-items:center;padding:0;border-radius:50%;font-size:1.9rem;line-height:1;
+  background:#6b4a2a1f;color:#5b3d1e;cursor:pointer;flex:none}
+.x:hover{background:#6b4a2a33}
+.iconbtn.sm{width:38px !important;height:38px !important;font-size:1.45rem;line-height:1}
+.dslot .rm{top:-13px !important;right:-13px !important;width:32px !important;height:32px !important;font-size:1.15rem;display:grid;place-items:center;padding:0;line-height:1}
+.x::after,.iconbtn.sm::after,.dslot .rm::after{content:'';position:absolute;inset:-6px;border-radius:50%}
+.iconbtn.sm{position:relative}
+
+/* one consistent close/remove button everywhere */
+.x,.iconbtn.sm,.dslot .rm{position:relative;width:40px !important;height:40px !important;min-width:40px;padding:0 !important;border-radius:50% !important;
+  border:1.5px solid #5e3c0c !important;font-size:0 !important;color:transparent !important;line-height:0;cursor:pointer;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 4.5l11 11M15.5 4.5l-11 11' stroke='%232f2013' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") center/19px 19px no-repeat,radial-gradient(circle at 35% 30%,#f0cd7a,#c9922f 55%,#8c5d18) !important;
+  box-shadow:0 2px 4px #0007,inset 0 1px 0 #fff7 !important}
+.x:hover,.iconbtn.sm:hover,.dslot .rm:hover{filter:brightness(1.08)}
+.x:active,.iconbtn.sm:active,.dslot .rm:active{transform:scale(.94)}
+.dslot .rm{position:absolute !important;top:-15px !important;right:-15px !important;z-index:3}
+.freed{width:130px}
+.freed{transition:none !important}
 </style>
 </head>
 <body>
 <div class="app" id="app" data-panel="">
 <header class="topbar">
-  <h1 id="title" data-i18n="title">Moth Night</h1>
+  <h1 id="title" class="sr-only" data-i18n="title">Moth Night</h1>
   <div class="stats">
-    <span class="stat coin" data-i18n-title="stat.coins"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#e7b84a" stroke="#a8761a" stroke-width="1.5"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#a8761a" stroke-width="1.2"/></svg><b id="coins">0</b></span>
-    <span class="stat" data-i18n-title="stat.gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M12 7.5v3M12 10.5 6 14.5M12 10.5l6 4"/></svg><b id="gen">0</b></span>
+    <span class="stat coin" id="coinStat" data-i18n-title="stat.coins"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#e7b84a" stroke="#a8761a" stroke-width="1.5"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#a8761a" stroke-width="1.2"/></svg><b id="coins">0</b></span>
     <span class="stat" data-i18n-title="stat.del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></svg><b id="del">0</b></span>
   </div>
   <button class="iconbtn" data-act="info" data-i18n-aria="help">?</button>
@@ -471,6 +630,11 @@ body.is-dragging .boxarrow{outline:2px dashed var(--brass);outline-offset:2px}
           <button class="btn primary" id="breedBtn" data-act="breed">Breed</button>
         </div>
       </div>
+    </section>
+    <section id="relbar" class="dock relbar" data-i18n-aria="nav.release">
+      <span class="relcount" id="relCount"></span>
+      <div class="relacts"><button class="linkbtn" data-act="relCancel" data-i18n="cancel">Cancel</button>
+      <button class="btn danger" id="relBtn" data-act="relDo">Release</button></div>
     </section>
   </section>
   <section class="pane side" id="paneOrders" data-i18n-aria="pane.orders">
@@ -497,8 +661,8 @@ body.is-dragging .boxarrow{outline:2px dashed var(--brass);outline-offset:2px}
   <button data-act="nav" data-panel="" data-spring="moths" id="navMoths"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v12"/><path d="M12 10C10 4 3 3 3 8c0 3 4 4.5 9 3.5"/><path d="M12 10c2-6 9-7 9-2 0 3-4 4.5-9 3.5"/><path d="M12 13c-2 1.5-6.5 2.5-6.5 5.5 0 2 4.5.5 6.5-3"/><path d="M12 13c2 1.5 6.5 2.5 6.5 5.5 0 2-4.5.5-6.5-3"/><path d="M11 6.5 9 3.5M13 6.5l2-3"/></svg><span data-i18n="pane.moths">Moths</span></button>
   <button data-act="nav" data-panel="orders" data-spring="orders" id="navOrders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10h7M8.5 14h7M8.5 18h4"/></svg><span data-i18n="pane.orders">Commissions</span><span class="badge" id="ordersBadge"></span></button>
   <button data-act="nav" data-panel="garden" id="navGarden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="2"/><path d="M12 6c0-2.5 3-3 3-.5S13.5 8 12 8M12 6c0-2.5-3-3-3-.5S10.5 8 12 8M12 10c0 2.5 3 3 3 .5S13.5 8 12 8M12 10c0 2.5-3 3-3 .5S10.5 8 12 8"/><path d="M12 10v11"/><path d="M12 17c-3 0-5-2-5-4 2 0 5 1 5 4zM12 15c3 0 5-2 5-4-2 0-5 1-5 4z"/></svg><span data-i18n="pane.garden">Garden</span></button>
-  <button data-act="sellHint" data-drop="sell" id="navSell" data-i18n-aria="release.aria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.5c1.5 4 5 5.5 9 5.5s7.5-1.5 9-5.5"/><path d="M3 14.5c2.5-.8 4.5-.3 6 1.2M21 14.5c-2.5-.8-4.5-.3-6 1.2"/><path d="M12 4.5v6"/><path d="M12 6.5c-1.2-2.6-5-3-5-.6 0 1.9 2.9 2.3 5 1.4M12 6.5c1.2-2.6 5-3 5-.6 0 1.9-2.9 2.3-5 1.4"/><path d="M12 9c-1 1-3 1.6-3 3 0 1 2 .4 3-1.4M12 9c1 1 3 1.6 3 3 0 1-2 .4-3-1.4"/></svg><span id="sellLabel">Release</span></button>
   <button data-act="dock" data-spring="breed" id="navBreed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 6.5C9.6 4.3 10.8 3 12 3c3 0 6 6 6 11a6 6 0 0 1-12 0c0-1.7.4-3.6 1-5.3"/><path d="M5 12h3l1.5-2 2 4 1.5-2H15"/></svg><span data-i18n="nav.breeding">Breeding</span><span class="badge" id="breedBadge"></span></button>
+  <button data-act="relMode" id="navSell" data-i18n-aria="release.aria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.5c1.5 4 5 5.5 9 5.5s7.5-1.5 9-5.5"/><path d="M3 14.5c2.5-.8 4.5-.3 6 1.2M21 14.5c-2.5-.8-4.5-.3-6 1.2"/><path d="M12 4.5v6"/><path d="M12 6.5c-1.2-2.6-5-3-5-.6 0 1.9 2.9 2.3 5 1.4M12 6.5c1.2-2.6 5-3 5-.6 0 1.9-2.9 2.3-5 1.4"/><path d="M12 9c-1 1-3 1.6-3 3 0 1 2 .4 3-1.4M12 9c1 1 3 1.6 3 3 0 1-2 .4-3-1.4"/></svg><span id="sellLabel">Release</span></button>
 </nav>
 </div>
 <aside id="dev" class="dev" hidden aria-label="Testing panel">
@@ -718,7 +882,6 @@ function render(){
   const hatched=new Set(fresh);fresh.clear();
   applyStatic();
   document.getElementById('coins').textContent=state.coins;
-  document.getElementById('gen').textContent=state.bestGen;
   document.getElementById('del').textContent=state.deliveries;
   const cb=curBox();
   document.getElementById('boxbar').innerHTML=state.boxes.map(b=>{const n=inBox(b.id).length,on=b===cb;
@@ -734,9 +897,10 @@ function render(){
   const shown=inBox(cb.id);
   document.getElementById('grid').innerHTML=shown.length?shown.map(m=>{
     const si=state.sel.indexOf(m.id);
-    return `<div class="card${si>=0?' sel':''}${hatched.has(m.id)?' hatch':''}" data-drag="stable" data-drop="card" data-id="${m.id}" tabindex="0" role="button" aria-label="${t('cardAria',{name:m.name,gen:m.gen,slot:si>=0?t('cardSlot',{n:si+1}):''})}">
-      ${si>=0?`<span class="pin">${t('parentN',{n:si+1})}</span>`:''}
-      <span class="stage">${mothSVG(phen(m.genes),m.id)}</span><span class="nm">${m.name}</span><span class="meta">${t('gen',{n:m.gen})}</span></div>`;
+    const rs=state.ui.relMode&&state.ui.relSel.includes(m.id);
+    return `<div class="card${si>=0?' sel':''}${rs?' rsel':''}${hatched.has(m.id)?' hatch':''}" data-drag="stable" data-drop="card" data-id="${m.id}" tabindex="0" role="button" aria-label="${t('cardAria',{name:m.name,gen:m.gen,slot:si>=0?t('cardSlot',{n:si+1}):''})}">
+      ${si>=0?`<span class="pin">${t('parentN',{n:si+1})}</span>`:''}${state.ui.relMode?'<span class="rchk" aria-hidden="true"></span>':''}
+      <span class="stage named">${mothSVG(phen(m.genes),m.id)}<span class="nm">${esc(m.name)}</span></span></div>`;
   }).join(''):`<div class="empty">${state.moths.length?t('emptyBox'):t('empty')}</div>`;
 
   [0,1].forEach(i=>{
@@ -747,12 +911,20 @@ function render(){
     }else{
       el.className='dslot filled';el.dataset.drag='slot';el.dataset.id=m.id;el.dataset.slot=i;
       el.innerHTML=`<button class="rm" data-act="unslot" data-slot="${i}" aria-label="${t('removeFromSlot',{name:m.name})}">×</button>
-        <span class="stage">${mothSVG(phen(m.genes),m.id)}</span><span class="nm">${m.name}</span><span class="meta">${t('gen',{n:m.gen})}</span>`;
+        <span class="stage named">${mothSVG(phen(m.genes),m.id)}<span class="nm">${esc(m.name)}</span></span>`;
     }
   });
   const dock=document.getElementById('dock');
   dock.classList.toggle('open',!!state.ui.dock);
   document.getElementById('navBreed').setAttribute('aria-pressed',!!state.ui.dock);
+  const rel=!!state.ui.relMode;state.ui.relSel=(state.ui.relSel||[]).filter(byId);
+  document.getElementById('navSell').setAttribute('aria-pressed',rel);
+  document.getElementById('relbar').classList.toggle('open',rel);
+  const rn=state.ui.relSel.length;
+  document.getElementById('relCount').textContent=rn?t('relCount',{n:rn}):t('relNone');
+  const rb=document.getElementById('relBtn');rb.textContent=t('relDo',{n:rn});rb.disabled=!rn;
+  document.getElementById('grid').classList.toggle('relmode',rel);
+  document.getElementById('grid').classList.toggle('breedmode',!rel&&!!state.ui.dock);
   const nsel=state.sel.filter(x=>byId(x)).length;
   document.getElementById('breedBadge').textContent=nsel?`${nsel}/2`:'';
   const [a,b]=state.sel.map(byId);
@@ -766,12 +938,11 @@ function render(){
   let payable=0;
   document.getElementById('orders').innerHTML=state.orders.map((o,j)=>{
     const best=bestFor(o),bp=best?payout(o,best.s):0;if(bp)payable++;
-    return `<div class="order" data-drop="order:${o.id}"><div class="otop"><span class="stage">${mothSVG(o.target,o.id)}</span><div>
+    return `<div class="order" data-drop="order:${o.id}" data-act="compare" data-id="${o.id}" role="button" tabindex="0" aria-label="${t('compare')}: ${clientName(o)}"><div class="otop"><span class="stage">${mothSVG(o.target,o.id)}</span><div>
       <div class="who">${clientName(o)}</div><div class="reward">${COIN}${o.reward}</div>
       ${best?`<div class="best">${t('best',{name:best.m.name,pct:pc(best.s)})}${bp?` (${COIN}${bp})`:''}</div>`:''}
       ${pred?`<div class="chance" title="${t('pairTitle')}">${t('pair',{avg:pc(pred[j].avg),hi:pred[j].hi<.005&&pred[j].hi>0?'<1%':pc(pred[j].hi)})}</div>`:''}
-      </div></div><div class="foot"><button class="linkbtn" data-act="swap" data-id="${o.id}" ${state.coins<COST.swap?'disabled':''} aria-label="${t('swapAria',{n:COST.swap})}">${t('swap')} ${COIN}${COST.swap}</button>
-      <button class="btn small primary" data-act="compare" data-id="${o.id}">${t('compare')}</button></div></div>`;
+      </div></div><div class="foot"><button class="linkbtn" data-act="swap" data-id="${o.id}" ${state.coins<COST.swap?'disabled':''} aria-label="${t('swapAria',{n:COST.swap})}">${t('swap')} ${COIN}${COST.swap}</button></div></div>`;
   }).join('');
   document.getElementById('ordersBadge').textContent=payable||'';
   syncGarden();
@@ -795,9 +966,7 @@ function renderDialog(){
         if(!pa)return `<figure class="par"><span class="stage unknown" aria-label="${t('unknownAria')}">?</span><figcaption>${t('unknown')}</figcaption></figure>`;
         const here=byId(pa.id);
         return `<figure class="par">${here?`<button class="parbtn" data-act="details" data-id="${pa.id}" aria-label="${t('open',{name:pa.name})}">`:''}<span class="stage">${mothSVG(phen(pa.genes),pa.id)}</span>${here?'</button>':''}<figcaption>${pa.name}${here?'':` <small>${t('gone')}</small>`}</figcaption></figure>`}).join('')}</div>
-      <div class="stage big">${mothSVG(p,m.id)}</div>
-      <div class="dacts"><button class="btn ${picked?'':'primary'}" data-act="select" data-id="${m.id}">${picked?t('removeBreed'):t('addBreed')}</button>
-      <button class="btn" data-act="sell" data-id="${m.id}">${t('release')}</button></div>`;
+      <div class="stage big">${mothSVG(p,m.id)}</div>`;
   }else if(dlgState.t==='order'){
     const o=state.orders.find(x=>x.id===dlgState.id);if(!o){dlgState=null;if(dlg.open)dlg.close();return}
     dlg.classList.add('wide');
@@ -819,7 +988,7 @@ function renderDialog(){
     html=`<div class="dhead"><div><h3>${t('help')}</h3></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
     <div class="langsw" role="group" aria-label="${t('language')}"><span>${t('language')}</span>
       <button data-act="lang" data-lang="en" aria-pressed="${lang()==='en'}">English</button><button data-act="lang" data-lang="es" aria-pressed="${lang()==='es'}">Español</button></div>
-    <div class="info">${t('info')({min:pc(state.tuning.payMin),full:pc(state.tuning.payFull)})}</div>
+    <div class="info">${t('info')({min:pc(state.tuning.payMin),full:pc(state.tuning.payFull),swap:COST.swap})}</div>
     <div class="dacts"><button class="linkbtn" data-act="reset">${t('startOver')}</button></div>`;
   }else if(dlgState.t==='box'){
     const b=state.boxes.find(x=>x.id===dlgState.id);if(!b){dlgState=null;if(dlg.open)dlg.close();return}
@@ -851,17 +1020,20 @@ document.addEventListener('click',e=>{
   else if(act==='boxSave'){const b=state.boxes.find(x=>x.id===id),v=(document.getElementById('boxName').value||'').trim().slice(0,24);if(b)b.name=v;dlgState=null}
   else if(act==='boxDel'){const b=state.boxes.find(x=>x.id===id);if(b&&state.boxes.length>1&&!inBox(id).length){state.boxes=state.boxes.filter(x=>x!==b);state.ui.box=state.boxes[0].id}dlgState=null}
   else if(act==='lang'){state.ui.lang=el.dataset.lang;try{localStorage.setItem('mothnight-lang',state.ui.lang)}catch(e){}}
-  else if(act==='sellHint'){toast(t('releaseHint'));return}
+  else if(act==='relMode'){setRelMode(!state.ui.relMode)}
+  else if(act==='relCancel'){setRelMode(false)}
+  else if(act==='relDo'){const ids=(state.ui.relSel||[]).filter(byId);if(ids.length){releaseMoths(ids);setRelMode(false)}}
   else if(act==='close')dlgState=null;
   else if(act==='select'){
     const i=state.sel.indexOf(id);
-    if(i>=0)state.sel[i]=null;else{const e=state.sel.indexOf(null);state.sel[e>=0?e:1]=id;state.ui.dock=true}
+    if(i>=0)state.sel[i]=null;else{const e=state.sel.indexOf(null);state.sel[e>=0?e:1]=id;state.ui.dock=true;state.ui.relMode=false;state.ui.relSel=[]}
   }else if(act==='sell'){
     sellMoth(id);
   }else if(act==='unslot'){
     state.sel[+el.dataset.slot]=null;
   }else if(act==='dock'){
     if(state.ui.panel&&window.innerWidth<900){state.ui.panel='';state.ui.dock=true}else state.ui.dock=!state.ui.dock;
+    if(state.ui.dock){state.ui.relMode=false;state.ui.relSel=[]}
   }else if(act==='undoSell'){
     undoSell();
   }else if(act==='catchVisitor'){
@@ -908,7 +1080,7 @@ function restFlap(now,ph){
 /* ---------- garden scene ---------- */
 const PROPS=[{t:'lantern',left:13,h:66},{t:'flower',left:35,h:34,c:'#d9c6f0',k:'#b48fd6'},{t:'flower',left:53,h:47,c:'#f4e7c8',k:'#e3b85a'},
   {t:'flower',left:70,h:28,c:'#f2bccb',k:'#d77c97'},{t:'flower',left:87,h:40,c:'#c9dcf2',k:'#8fb0d9'}];
-const G={vis:[],raf:0,next:0,vid:1,built:false};
+const G={vis:[],raf:0,next:performance.now()+1500,vid:1,built:false,timer:0};
 function lanternSVG(){
   return `<svg viewBox="0 0 90 300" aria-hidden="true">
     <defs><radialGradient id="lglow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".18"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient></defs>
@@ -948,70 +1120,78 @@ function perchPoint(i,sr){
   const el=document.querySelector(`.prop[data-i="${i}"] .perch`);if(!el)return [sr.width/2,sr.height/2];
   const r=el.getBoundingClientRect();return [r.left+r.width/2-sr.left,r.top+r.height/2-sr.top];
 }
-function edgePoint(W,H){
-  const side=Math.floor(Math.random()*3);
-  if(side===0)return [-90,H*(.05+Math.random()*.5)];
-  if(side===1)return [W+90,H*(.05+Math.random()*.5)];
-  return [W*(.1+Math.random()*.8),-90];
-}
+// Flight paths are stored in scene fractions (0..1) so the garden can keep living while it's off screen.
+function edgeN(){const side=Math.floor(Math.random()*3);
+  if(side===0)return [-.2,.05+Math.random()*.5];if(side===1)return [1.2,.05+Math.random()*.5];return [.1+Math.random()*.8,-.25]}
+const rndN=()=>[.1+Math.random()*.8,.08+Math.random()*.6];
 const bez=(a,c1,c2,b,t)=>{const u=1-t;return [0,1].map(k=>u*u*u*a[k]+3*u*u*t*c1[k]+3*u*t*t*c2[k]+t*t*t*b[k])};
-const rndPt=(W,H)=>[W*(.1+Math.random()*.8),H*(.08+Math.random()*.6)];
-function spawnVisitor(){
-  const sr=sceneBox();if(!sr||!sr.width||!gardenOn())return;
-  const free=PROPS.map((_,i)=>i).filter(i=>!G.vis.some(v=>v.perch===i&&!v.leaving));if(!free.length)return;
-  const perch=pick(free),W=sr.width,H=sr.height;
-  const m=newMoth(wildGenes()),p=phen(m.genes);
-  const size=Math.min(175,Math.max(72,Math.min(W,H)*(.17+p.size*.09)));
+const toPx=(n,W,H)=>[n[0]*W,n[1]*H];
+function spawnVisitor(now=performance.now()){
+  const free=PROPS.map((_,i)=>i).filter(i=>!G.vis.some(v=>v.perch===i&&!v.leaving&&!v.caught));if(!free.length)return;
+  buildGarden();
+  const perch=pick(free),m=newMoth(wildGenes()),p=phen(m.genes);
   const el=document.createElement('button');
   el.className='visitor flying';el.dataset.act='catchVisitor';el.dataset.vid=G.vid;
   el.setAttribute('aria-label',t('catchAria',{name:m.name}));
-  el.style.width=size+'px';el.innerHTML=mothSVG(p,m.id);
+  el.innerHTML=mothSVG(p,m.id);el.style.visibility='hidden';
   document.getElementById('gardenLayer').appendChild(el);
-  const wings=wingsOf(el);
-  const a=edgePoint(W,H);
-  const v={vid:G.vid++,m,el,perch,size,h:size*220/230,phase:'in',t0:performance.now(),dur:3000+Math.random()*2200,
-    a,c1:rndPt(W,H),c2:rndPt(W,H),x:a[0],y:a[1],ang:0,restAng:(Math.random()-.5)*26,rest:5500+Math.random()*7000,w:Math.random()*10,wings};
-  G.vis.push(v);
+  G.vis.push({vid:G.vid++,m,el,perch,sz:.17+p.size*.09,phase:'in',t0:now,dur:3000+Math.random()*2200,
+    a:edgeN(),c1:rndN(),c2:rndN(),x:null,y:null,ang:0,restAng:(Math.random()-.5)*26,rest:5500+Math.random()*7000,w:Math.random()*10,wings:wingsOf(el)});
+}
+// Time-based state machine: runs whether or not the garden is visible.
+function gardenLogic(){
+  const now=performance.now();
+  // catch up on spawns missed while away (at most one per call keeps things natural)
+  if(now>G.next&&G.vis.filter(v=>!v.caught).length<3){spawnVisitor(Math.min(now,G.next+500));G.next=now+3500+Math.random()*5500}
+  for(const v of [...G.vis]){
+    if(v.caught)continue;
+    if(v.phase==='in'&&now-v.t0>=v.dur){v.phase='rest';v.t0+=v.dur;v.el.classList.replace('flying','resting')}
+    if(v.phase==='rest'&&now-v.t0>=v.rest){v.phase='out';v.leaving=true;v.t0+=v.rest;v.aN=null;v.b=edgeN();v.c1=rndN();v.c2=rndN();v.dur=2600+Math.random()*1800;v.el.classList.replace('resting','flying')}
+    if(v.phase==='out'&&now-v.t0>=v.dur){v.el.remove();G.vis=G.vis.filter(z=>z!==v)}
+  }
 }
 function placeVisitor(v,x,y){
+  if(v.x==null){v.x=x;v.y=y;v.ang=v.phase==='rest'?v.restAng:0;v.el.style.visibility=''}
   const dx=x-v.x,dy=y-v.y;
   let target=v.phase==='rest'?v.restAng:(Math.abs(dx)+Math.abs(dy)>.3?Math.atan2(dy,dx)*180/Math.PI+90:v.ang);
   let diff=((target-v.ang+540)%360)-180;v.ang+=diff*(v.phase==='rest'?.08:.12);
   v.x=x;v.y=y;
   v.el.style.transform=`translate(${(x-v.size/2).toFixed(1)}px,${(y-v.h*.418).toFixed(1)}px) rotate(${v.ang.toFixed(1)}deg)`;
 }
+// Drawing: only while the garden is on screen.
 function gardenTick(){
   G.raf=0;if(!gardenOn())return;
-  const now=performance.now(),sr=sceneBox();if(!sr)return;
-  if(now>G.next&&G.vis.filter(v=>!v.caught).length<3){spawnVisitor();G.next=now+3500+Math.random()*5500}
-  for(const v of [...G.vis]){
-    setFlap(v.wings,v.phase==='rest'&&!v.caught?restFlap(now,v.w):flyFlap(now,v.w));
-    if(v.caught)continue;
-    let x,y;
-    if(v.phase==='in'){
-      let t=Math.min(1,(now-v.t0)/v.dur);const b=perchPoint(v.perch,sr),e=1-Math.pow(1-t,3);
-      [x,y]=bez(v.a,v.c1,v.c2,b,e);const k=1-e;
-      x+=Math.cos(now/140+v.w)*10*k;y+=Math.sin(now/95+v.w)*12*k;
-      if(t>=1){v.phase='rest';v.t0=now;v.el.classList.replace('flying','resting')}
-    }else if(v.phase==='rest'){
-      [x,y]=perchPoint(v.perch,sr);
-      if(now-v.t0>v.rest){v.phase='out';v.leaving=true;v.t0=now;v.a=[x,y];v.b=edgePoint(sr.width,sr.height);v.c1=rndPt(sr.width,sr.height);v.c2=rndPt(sr.width,sr.height);v.dur=2600+Math.random()*1800;v.el.classList.replace('resting','flying')}
-    }else{
-      const t=Math.min(1,(now-v.t0)/v.dur),e=t*t*(3-2*t)*t;
-      [x,y]=bez(v.a,v.c1,v.c2,v.b,e);x+=Math.cos(now/140+v.w)*10*t;y+=Math.sin(now/95+v.w)*12*t;
-      if(t>=1){v.el.remove();G.vis=G.vis.filter(z=>z!==v);continue}
+  gardenLogic();
+  const now=performance.now(),sr=sceneBox();
+  if(sr&&sr.width){
+    const W=sr.width,H=sr.height;
+    for(const v of G.vis){
+      if(v.caught){setFlap(v.wings,flyFlap(now,v.w));continue}
+      v.size=Math.min(175,Math.max(72,Math.min(W,H)*v.sz));v.h=v.size*220/230;
+      if(v.el.style.width!==v.size+'px')v.el.style.width=v.size+'px';
+      setFlap(v.wings,v.phase==='rest'?restFlap(now,v.w):flyFlap(now,v.w));
+      let x,y;const perch=perchPoint(v.perch,sr);
+      if(v.phase==='in'){
+        const t=Math.min(1,(now-v.t0)/v.dur),e=1-Math.pow(1-t,3);
+        [x,y]=bez(toPx(v.a,W,H),toPx(v.c1,W,H),toPx(v.c2,W,H),perch,e);const k=1-e;
+        x+=Math.cos(now/140+v.w)*10*k;y+=Math.sin(now/95+v.w)*12*k;
+      }else if(v.phase==='rest'){
+        [x,y]=perch;
+      }else{
+        if(!v.aN)v.aN=[perch[0]/W,perch[1]/H];
+        const t=Math.min(1,(now-v.t0)/v.dur),e=t*t*(3-2*t)*t;
+        [x,y]=bez(toPx(v.aN,W,H),toPx(v.c1,W,H),toPx(v.c2,W,H),toPx(v.b,W,H),e);x+=Math.cos(now/140+v.w)*10*t;y+=Math.sin(now/95+v.w)*12*t;
+      }
+      placeVisitor(v,x,y);
     }
-    placeVisitor(v,x,y);
   }
   G.raf=requestAnimationFrame(gardenTick);
 }
 function syncGarden(){
-  if(gardenOn()){
-    buildGarden();
-    if(!G.raf){if(!G.vis.length)G.next=performance.now()+600;G.raf=requestAnimationFrame(gardenTick)}
-  }else if(G.vis.length||G.raf){
-    cancelAnimationFrame(G.raf);G.raf=0;G.vis.forEach(v=>v.el.remove());G.vis=[];
-  }
+  buildGarden();
+  if(!G.timer)G.timer=setInterval(()=>{if(!gardenOn())gardenLogic()},400);
+  if(gardenOn()){if(!G.raf)G.raf=requestAnimationFrame(gardenTick)}
+  else if(G.raf){cancelAnimationFrame(G.raf);G.raf=0}
 }
 function catchVisitor(vid){
   const v=G.vis.find(x=>x.vid===vid);if(!v||v.caught)return;
@@ -1028,13 +1208,14 @@ function catchVisitor(vid){
 /* ---------- localization ---------- */
 const I18N={
 en:{
+  relCount:'{n} selected',relNone:'Tap to select',relDo:'Release ({n})',cancel:'Cancel',flewMany:'{n} moths flew away',cameBackMany:'{n} moths came back',
   scrollLeft:'Scroll boxes left',scrollRight:'Scroll boxes right',
   boxN:'Box {n}',addBox:'Add box',boxFull:'That box is full',allFull:'All your boxes are full. Release a moth or add a box.',noSpace:'No space',
   movedTo:'{name} moved to {box}',renameBox:'Box name',save:'Save',deleteBox:'Delete box',deleteHint:'Empty this box to delete it.',
   emptyBox:'This box is empty. Drag a moth onto its tab to move it here.',
   title:'Moth Night','stat.coins':'Coins','stat.gen':'Best generation','stat.del':'Commissions delivered',help:'How to play',
   'pane.moths':'Moths','pane.orders':'Commissions','pane.garden':'Garden','nav.release':'Release','nav.letgo':'Let go','nav.breeding':'Breeding',
-  'nav.aria':'Game panels','release.aria':'Release. Drag a moth here to let it go','closeOrders':'Close commissions','closeGarden':'Close garden',
+  'nav.aria':'Game panels','release.aria':'Release moths','closeOrders':'Close commissions','closeGarden':'Close garden',
   breed:'Breed',stableFull:'Stable full',parentN:'Parent {n}',gen:'Gen {n}',
   empty:'Your collection is empty. Visit the garden to catch a wild moth.',
   cardAria:'{name}, generation {gen}{slot}. Open details',cardSlot:', breeding slot {n}',removeFromSlot:'Remove {name} from slot',
@@ -1050,25 +1231,24 @@ en:{
   cantBack:'Your collection is full, so it can’t come back.',cameBack:'{name} came back',undo:'Undo',catchAria:'Catch {name}',
   language:'Language',startOver:'Start over',
   info:p=>`<h4>The goal</h4>
-    <ul><li>Each commission shows a moth a customer wants. The closer your moth looks, the more they pay. Color matters most.</li>
-    <li>Payment starts at a ${p.min} match and reaches full price around ${p.full}.</li></ul>
-    <h4>Controls</h4>
-    <ul><li>Tap a moth to see its details.</li>
-    <li>Drag a moth to a breeding slot or a commission, or onto Release in the bottom bar to let it go. On touch screens, press and hold first.</li>
-    <li>Drag a moth between other moths to reorder your collection.</li>
-    <li>Each box holds 20 moths. Tap + to add a box. Drop a moth on a box tab to move it there, or hold over a tab to open that box. Tap the open box's tab to rename or delete it.</li>
-    <li>While dragging, hold over Moths, Commissions or Breeding in the bottom bar to open that screen.</li>
-    <li>Released a moth by mistake? Tap Undo on the message that appears.</li></ul>
+    <ul><li>Customers post commissions showing the moth they want. Breed one that looks like it and deliver it for coins.</li>
+    <li>The closer the match, the more they pay. Color matters most. They start paying at a ${p.min} match and pay in full at ${p.full}.</li></ul>
+    <h4>Your moths</h4>
+    <ul><li>Tap a moth to see it and its parents.</li>
+    <li>Each box holds 20 moths. Tap + to add a box, or tap the open box's tab to rename or delete it.</li>
+    <li>Drag a moth to reorder it, or drop it on a box tab to move it there. On touch screens, press and hold first.</li></ul>
     <h4>Breeding</h4>
-    <ul><li>Put two moths in the slots and tap Breed. Each clutch hatches 2 or 3 eggs.</li>
-    <li>Wild moths visit the Garden now and then. Tap one to catch it and bring in traits you're missing.</li></ul>
-    <h4>How inheritance works</h4>
-    <ul><li>Each trait is shaped by one to four genes. Every gene has two copies, one from each parent, and the trait is the blend of all of them.</li>
-    <li>Eggs usually land between their parents, but siblings can differ a lot. Pairing the most extreme children pushes a trait further each generation.</li>
-    <li>Tails, eyespots, bands, speckles and dark edges only appear once their genes pass a threshold, so a moth can carry traits it doesn't show.</li>
-    <li>About one egg in three carries a small mutation.</li></ul>
-    <h4>Planning a pair</h4>
-    <ul><li>With two moths in the breeding slots, each commission shows how well a typical egg would match and the chance of a 90% match.</li></ul>`,
+    <ul><li>Open Breeding, tap two moths to put them in the slots, then tap Breed. You get 2 or 3 eggs.</li>
+    <li>Babies mix their parents' traits, and siblings can turn out quite different. Keep pairing the closest ones to get nearer to what you need.</li>
+    <li>Some traits, like tails or eyespots, can stay hidden and appear in a later generation.</li>
+    <li>With two parents in the slots, each commission shows how well a typical egg would match.</li></ul>
+    <h4>Commissions</h4>
+    <ul><li>Tap a commission to compare it with your moths and deliver one.</li>
+    <li>Don't like a commission? Swap it for a new one for ${p.swap} coins.</li></ul>
+    <h4>Garden</h4>
+    <ul><li>Wild moths stop by the garden now and then. Tap one to catch it before it flies away.</li></ul>
+    <h4>Release</h4>
+    <ul><li>Tap Release, select the moths you don't need, then press the Release button. You can undo it right after.</li></ul>`,
   clients:['The lamplighter','Professor Wick at the moth museum','A night market stall','The observatory gift shop','A collector in the attic','The candle maker','A wedding planner','The botanist next door'],
   quotes:{
     none:['Not what I want, sorry.','Hmm, no. That’s not the moth I described.','I’m afraid that won’t do at all.','Sorry, that’s nothing like what I asked for.'],
@@ -1078,13 +1258,14 @@ en:{
     great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']}
 },
 es:{
+  relCount:'{n} seleccionadas',relNone:'Toca para elegir',relDo:'Liberar ({n})',cancel:'Cancelar',flewMany:'{n} polillas se han ido volando',cameBackMany:'Han vuelto {n} polillas',
   scrollLeft:'Desplazar cajas a la izquierda',scrollRight:'Desplazar cajas a la derecha',
   boxN:'Caja {n}',addBox:'Añadir caja',boxFull:'Esa caja está llena',allFull:'Todas tus cajas están llenas. Libera una polilla o añade una caja.',noSpace:'Sin espacio',
   movedTo:'{name} se ha movido a {box}',renameBox:'Nombre de la caja',save:'Guardar',deleteBox:'Eliminar caja',deleteHint:'Vacía esta caja para eliminarla.',
   emptyBox:'Esta caja está vacía. Arrastra una polilla a su pestaña para moverla aquí.',
   title:'Noche de Polillas','stat.coins':'Monedas','stat.gen':'Mejor generación','stat.del':'Encargos entregados',help:'Cómo jugar',
   'pane.moths':'Polillas','pane.orders':'Encargos','pane.garden':'Jardín','nav.release':'Liberar','nav.letgo':'Soltar','nav.breeding':'Cría',
-  'nav.aria':'Paneles del juego','release.aria':'Liberar. Arrastra una polilla aquí para soltarla','closeOrders':'Cerrar encargos','closeGarden':'Cerrar jardín',
+  'nav.aria':'Paneles del juego','release.aria':'Liberar polillas','closeOrders':'Cerrar encargos','closeGarden':'Cerrar jardín',
   breed:'Criar',stableFull:'Colección llena',parentN:'Progenitor {n}',gen:'Gen. {n}',
   empty:'Tu colección está vacía. Visita el jardín para atrapar una polilla salvaje.',
   cardAria:'{name}, generación {gen}{slot}. Ver detalles',cardSlot:', hueco de cría {n}',removeFromSlot:'Quitar a {name} del hueco',
@@ -1100,25 +1281,24 @@ es:{
   cantBack:'Tu colección está llena, así que no puede volver.',cameBack:'{name} ha vuelto',undo:'Deshacer',catchAria:'Atrapar a {name}',
   language:'Idioma',startOver:'Empezar de nuevo',
   info:p=>`<h4>El objetivo</h4>
-    <ul><li>Cada encargo muestra la polilla que quiere un cliente. Cuanto más se parezca la tuya, más te paga. Lo que más importa es el color.</li>
-    <li>Empiezan a pagar a partir de un ${p.min} de coincidencia y pagan el precio completo hacia el ${p.full}.</li></ul>
-    <h4>Controles</h4>
-    <ul><li>Toca una polilla para ver sus detalles.</li>
-    <li>Arrastra una polilla a un hueco de cría o a un encargo, o a Liberar en la barra inferior para soltarla. En pantallas táctiles, mantén pulsado primero.</li>
-    <li>Arrastra una polilla entre otras para reordenar tu colección.</li>
-    <li>Cada caja guarda 20 polillas. Toca + para añadir una caja. Suelta una polilla sobre la pestaña de una caja para moverla allí, o mantenla encima para abrir esa caja. Toca la pestaña de la caja abierta para renombrarla o eliminarla.</li>
-    <li>Mientras arrastras, mantén la polilla sobre Polillas, Encargos o Cría en la barra inferior para abrir esa pantalla.</li>
-    <li>¿Has liberado una polilla por error? Toca Deshacer en el mensaje que aparece.</li></ul>
+    <ul><li>Los clientes publican encargos con la polilla que quieren. Cría una que se le parezca y entrégala a cambio de monedas.</li>
+    <li>Cuanto más se parezca, más pagan. Lo que más importa es el color. Empiezan a pagar con un ${p.min} de coincidencia y pagan el precio completo con un ${p.full}.</li></ul>
+    <h4>Tus polillas</h4>
+    <ul><li>Toca una polilla para verla junto a sus progenitores.</li>
+    <li>Cada caja guarda 20 polillas. Toca + para añadir una caja, o toca la pestaña de la caja abierta para renombrarla o eliminarla.</li>
+    <li>Arrastra una polilla para reordenarla, o suéltala sobre la pestaña de una caja para moverla allí. En pantallas táctiles, mantén pulsado primero.</li></ul>
     <h4>Cría</h4>
-    <ul><li>Pon dos polillas en los huecos y toca Criar. Cada puesta da 2 o 3 huevos.</li>
-    <li>De vez en cuando llegan polillas salvajes al Jardín. Toca una para atraparla y conseguir rasgos que te faltan.</li></ul>
-    <h4>Cómo funciona la herencia</h4>
-    <ul><li>Cada rasgo depende de uno a cuatro genes. Cada gen tiene dos copias, una de cada progenitor, y el rasgo es la mezcla de todas.</li>
-    <li>Los huevos suelen quedar a medio camino entre sus progenitores, pero los hermanos pueden ser muy distintos. Cruzar a las crías más extremas lleva un rasgo más lejos en cada generación.</li>
-    <li>Las colas, los ocelos, las bandas, las motas y los bordes oscuros solo aparecen cuando sus genes superan un umbral, así que una polilla puede llevar rasgos que no muestra.</li>
-    <li>Aproximadamente uno de cada tres huevos tiene una pequeña mutación.</li></ul>
-    <h4>Planificar una pareja</h4>
-    <ul><li>Con dos polillas en los huecos de cría, cada encargo muestra cuánto se parecería un huevo típico y la probabilidad de lograr un 90% de coincidencia.</li></ul>`,
+    <ul><li>Abre Cría, toca dos polillas para ponerlas en los huecos y pulsa Criar. Nacen 2 o 3 huevos.</li>
+    <li>Las crías mezclan los rasgos de sus progenitores, y los hermanos pueden salir muy distintos. Sigue cruzando las que más se acerquen para llegar a lo que necesitas.</li>
+    <li>Algunos rasgos, como las colas o los ocelos, pueden quedar ocultos y aparecer en una generación posterior.</li>
+    <li>Con dos progenitores en los huecos, cada encargo muestra cuánto se parecería un huevo típico.</li></ul>
+    <h4>Encargos</h4>
+    <ul><li>Toca un encargo para compararlo con tus polillas y entregar una.</li>
+    <li>¿No te convence un encargo? Cámbialo por otro por ${p.swap} monedas.</li></ul>
+    <h4>Jardín</h4>
+    <ul><li>De vez en cuando llegan polillas salvajes al jardín. Toca una para atraparla antes de que se vaya volando.</li></ul>
+    <h4>Liberar</h4>
+    <ul><li>Toca Liberar, selecciona las polillas que no necesites y pulsa el botón Liberar. Puedes deshacerlo justo después.</li></ul>`,
   clients:['El farolero','El profesor Wick, del museo de polillas','Un puesto del mercado nocturno','La tienda de regalos del observatorio','Un coleccionista del desván','El fabricante de velas','Una organizadora de bodas','La botánica de al lado'],
   quotes:{
     none:['No es lo que busco, lo siento.','Mmm, no. Esa no es la polilla que describí.','Me temo que eso no me sirve.','Lo siento, no se parece en nada a lo que pedí.'],
@@ -1169,34 +1349,73 @@ function clientQuote(o,m,s,pay){
   return list[seed%list.length].replace('{c}',`<b>${COIN}${pay}</b>`);
 }
 
+/* ---------- tap modes ---------- */
+function tapMoth(id,from){
+  if(from==='slot'||!byId(id)){dlgState={t:'moth',id};return}
+  if(state.ui.relMode){
+    const r=state.ui.relSel||(state.ui.relSel=[]),i=r.indexOf(id);
+    if(i>=0)r.splice(i,1);else r.push(id);
+  }else if(state.ui.dock){
+    const i=state.sel.indexOf(id);
+    if(i>=0)state.sel[i]=null;else{const e=state.sel.indexOf(null);state.sel[e>=0?e:1]=id}
+  }else dlgState={t:'moth',id};
+}
+function setRelMode(on){
+  state.ui.relMode=on;state.ui.relSel=[];
+  if(on){state.ui.dock=false;if(state.ui.panel&&window.innerWidth<900)state.ui.panel=''}
+}
+
 /* ---------- selling with undo ---------- */
 let lastSold=null;
-function sellMoth(id){
-  const m=byId(id);if(!m)return;const idx=state.moths.indexOf(m);
-  lastSold={m,idx,slot:state.sel.indexOf(id)};
-  state.moths=state.moths.filter(x=>x.id!==id);state.sel=state.sel.map(x=>x===id?null:x);
-  if(dlgState&&dlgState.t==='moth'&&dlgState.id===id)dlgState=null;
-  flyAway(m);
-  toast(t('flew',{name:m.name}),true);
+function releaseMoths(ids){
+  const items=ids.map(id=>byId(id)).filter(Boolean).map(m=>({m,idx:state.moths.indexOf(m),slot:state.sel.indexOf(m.id)})).sort((a,b)=>a.idx-b.idx);
+  if(!items.length)return;
+  lastSold=items;
+  const set=new Set(items.map(x=>x.m.id));
+  state.moths=state.moths.filter(x=>!set.has(x.id));state.sel=state.sel.map(x=>set.has(x)?null:x);
+  if(dlgState&&dlgState.t==='moth'&&set.has(dlgState.id))dlgState=null;
+  let delay=0;items.slice(0,12).forEach(x=>{flyAway(x.m,delay);delay+=30+Math.random()*Math.random()*480});
+  toast(items.length===1?t('flew',{name:items[0].m.name}):t('flewMany',{n:items.length}),true);
 }
-function flyAway(m){
-  const nb=document.getElementById('navSell').getBoundingClientRect();
-  const el=document.createElement('div');el.className='freed';el.innerHTML=mothSVG(phen(m.genes),m.id);
-  const sx=nb.left+nb.width/2-45,sy=nb.top-60;
-  el.style.transform=`translate(${sx}px,${sy}px) scale(.6)`;document.body.appendChild(el);
-  const ex=sx+(Math.random()-.5)*260,ey=-160,rot=(ex-sx)*.12;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.transform=`translate(${ex}px,${ey}px) rotate(${rot}deg) scale(.9)`;el.style.opacity='0'}));
-  const w=wingsOf(el),t0=performance.now(),ph=Math.random()*6;
-  (function loop(now){if(now-t0>1900)return;setFlap(w,flyFlap(now,ph));requestAnimationFrame(loop)})(t0);
-  setTimeout(()=>el.remove(),1900);
+function sellMoth(id){releaseMoths([id])}
+function flyAway(m,delay=0){
+  const nb=document.getElementById('navbar').getBoundingClientRect(),W=window.innerWidth;
+  const el=document.createElement('div');el.className='freed';el.innerHTML=mothSVG(phen(m.genes),m.id);el.style.opacity='0';
+  document.body.appendChild(el);
+  const r=Math.random;
+  const sx=W/2+(r()-.5)*Math.min(170,W*.4),sy=nb.top-150+(r()-.5)*60;
+  const ex=sx+(r()-.5)*Math.min(W*.9,560),ey=-170-r()*90;
+  const c1=[sx+(r()-.5)*240,sy-(70+r()*130)],c2=[ex+(r()-.5)*220,ey+140+r()*170];
+  const dur=1500+r()*1200,ph=r()*6,wob=6+r()*14,wf=80+r()*90,flapSp=.75+r()*.55,s0=.8+r()*.15;
+  const w=wingsOf(el);let t0=null,px=sx,py=sy,ang=0;
+  (function frame(now){
+    if(t0==null)t0=now+delay;
+    if(now<t0){requestAnimationFrame(frame);return}
+    const t=Math.min(1,(now-t0)/dur),e=t*t*(3-2*t);
+    const [bx,by]=bez([sx,sy],c1,c2,[ex,ey],e);
+    const x=bx+Math.sin(now/wf+ph)*wob*(1-t*.4),y=by+Math.cos(now/(wf*.8)+ph)*wob*.4;
+    const dx=bx-px,dy=by-py;
+    if(Math.abs(dx)+Math.abs(dy)>.4){const target=Math.atan2(dy,dx)*180/Math.PI+90;ang+=(((target-ang+540)%360)-180)*.1*Math.min(1,t/.3)}
+    px=bx;py=by;
+    const op=t<.07?t/.07:(t>.68?Math.max(0,1-(t-.68)/.32):1);
+    el.style.opacity=op.toFixed(3);
+    el.style.transform=`translate(${(x-65).toFixed(1)}px,${(y-55).toFixed(1)}px) rotate(${ang.toFixed(1)}deg) scale(${(s0+.3*t).toFixed(3)})`;
+    setFlap(w,flyFlap(now*flapSp,ph));
+    if(t<1)requestAnimationFrame(frame);else el.remove();
+  })(performance.now());
 }
 function undoSell(){
   const L=lastSold;if(!L)return;lastSold=null;
-  const ob=state.boxes.find(b=>b.id===L.m.box);
-  if(ob&&boxFree(ob)>0){state.moths.splice(Math.min(L.idx,state.moths.length),0,L.m)}else if(!addMoth(L.m,L.idx))return toast(t('cantBack'));
-  fresh.add(L.m.id);
-  if(L.slot>=0&&state.sel[L.slot]==null)state.sel[L.slot]=L.m.id;
-  toast(t('cameBack',{name:L.m.name}));
+  let back=0;
+  for(const x of L){
+    const ob=state.boxes.find(b=>b.id===x.m.box);
+    if(ob&&boxFree(ob)>0)state.moths.splice(Math.min(x.idx,state.moths.length),0,x.m);
+    else if(!addMoth(x.m,x.idx))continue;
+    fresh.add(x.m.id);back++;
+    if(x.slot>=0&&state.sel[x.slot]==null)state.sel[x.slot]=x.m.id;
+  }
+  if(!back)return toast(t('cantBack'));
+  toast(back===1?t('cameBack',{name:L[0].m.name}):t('cameBackMany',{n:back}));
 }
 
 /* ---------- box tab scrolling ---------- */
@@ -1219,7 +1438,7 @@ function startDrag(){
   const d=drag.src;if(!d||d.active)return;
   d.active=true;
   const g=document.createElement('div');g.className='ghost';
-  const st=d.el.querySelector('.stage');g.innerHTML=st?st.innerHTML:'';
+  const sv=d.el.querySelector('svg.moth');g.innerHTML=sv?sv.outerHTML:'';
   document.body.appendChild(g);d.ghost=g;
   d.el.classList.add('dragging');document.body.classList.add('is-dragging');
   autoScroll();
@@ -1227,7 +1446,7 @@ function startDrag(){
 }
 function springTo(pn){
   const mobile=window.innerWidth<900;
-  if(pn==='breed'){if(mobile)state.ui.panel='';state.ui.dock=true}
+  if(pn==='breed'){if(mobile)state.ui.panel='';state.ui.dock=true;state.ui.relMode=false;state.ui.relSel=[]}
   else if(pn==='moths')state.ui.panel='';
   else if(pn.startsWith('box:')){state.ui.panel='';state.ui.box=+pn.slice(4)}
   else state.ui.panel=pn;
@@ -1295,8 +1514,7 @@ function endDrag(drop){
   const d=drag.src;drag.src=null;if(!d)return;
   clearTimeout(d.timer);
   if(!d.active){
-    if(drop&&!d.moved)dlgState={t:'moth',id:d.id};
-    if(drop&&!d.moved)render();
+    if(drop&&!d.moved){tapMoth(d.id,d.from);render()}
     return;
   }
   if(d.ghost)d.ghost.remove();
@@ -1328,7 +1546,7 @@ function endDrag(drop){
   }else if(d.from==='slot'&&drop&&d.moved){
     state.sel[d.slot]=null;
   }else if(drop&&!d.moved){
-    dlgState={t:'moth',id:d.id};
+    tapMoth(d.id,d.from);
   }
   render();
 }
@@ -1360,8 +1578,10 @@ document.addEventListener('touchmove',e=>{if(drag.src&&drag.src.active)e.prevent
 document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-drag]'))e.preventDefault()});
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter'&&e.key!==' ')return;
+  const oc=e.target.closest&&e.target.closest('.order[data-act="compare"]');
+  if(oc&&e.target===oc){e.preventDefault();dlgState={t:'order',id:+oc.dataset.id};render();return}
   const el=e.target.closest&&e.target.closest('.card[data-drag]');if(!el)return;
-  e.preventDefault();dlgState={t:'moth',id:+el.dataset.id};render();
+  e.preventDefault();tapMoth(+el.dataset.id,'stable');render();
 });
 
 /* ---------- secret testing panel ---------- */
@@ -1498,7 +1718,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();dev.open?devClose():devOpen();
 });
 let taps=[];
-document.getElementById('title').addEventListener('click',()=>{
+document.getElementById('coinStat').addEventListener('click',()=>{
   const now=Date.now();taps=taps.filter(t=>now-t<2000);taps.push(now);
   if(taps.length>=5){taps=[];dev.open?devClose():devOpen()}
 });
@@ -1506,6 +1726,7 @@ document.getElementById('title').addEventListener('click',()=>{
 state=load();if(!state)newGame();
 if(!state.tuning||state.tuning.v!==3)state.tuning=defaultTuning();
 if(!state.ui)state.ui={dock:true};
+state.ui.relSel=state.ui.relSel||[];
 if(!Array.isArray(state.boxes)||!state.boxes.length)state.boxes=[{id:state.nextId++,name:''}];
 state.moths.forEach(m=>{if(!state.boxes.some(b=>b.id===m.box))m.box=state.boxes[0].id});
 if(!state.boxes.some(b=>b.id===state.ui.box))state.ui.box=state.boxes[0].id;
