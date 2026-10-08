@@ -807,6 +807,79 @@ body.is-dragging .dslot.filled.over{border-color:var(--rose) !important;box-shad
 .navbar{padding-left:max(16px,calc((100% - 1280px) / 2 + 16px)) !important;padding-right:max(16px,calc((100% - 1280px) / 2 + 16px)) !important}
 .navbar button,.navbar button[aria-pressed="true"]{flex:1 1 0 !important;max-width:none !important}
 .navbar button[aria-pressed="true"]::before{left:42%;right:42%}
+
+/* ---------- toasts at the top ---------- */
+#toast{bottom:auto !important;top:calc(var(--toph,60px) + 8px) !important;transform:translateX(-50%) translateY(-14px) !important;z-index:70 !important}
+#toast.show{transform:translateX(-50%) translateY(0) !important}
+/* ---------- commissions label always visible; compact rating on narrow screens ---------- */
+@media (max-width:520px){.topbtn .lbl{display:inline !important}.topbtn{width:auto !important;padding:0 .7rem 0 .55rem !important}}
+.star1{display:none;width:15px;height:15px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 1.6l2.47 5.3 5.8.67-4.3 3.95 1.17 5.73L10 14.4l-5.14 2.85 1.17-5.73-4.3-3.95 5.8-.67z' fill='%23e9a92a' stroke='%238c5d18' stroke-width='1.3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+@media (max-width:460px){.stat.rating .stars{display:none}.star1{display:inline-block}.stat.rating{gap:4px;padding:.3rem .6rem .3rem .45rem !important}
+  .topbar{gap:6px !important}.topbtn{font-size:.86rem}}
+/* ---------- first-time tutorial bubble ---------- */
+.tut{position:fixed;z-index:65;background:var(--ink);color:#f7f2e8;border-radius:14px;padding:12px 14px 12px;box-shadow:0 12px 32px #2a1c0f55;
+  font-size:.95rem;line-height:1.35;animation:tutIn .25s ease}
+.tut[hidden]{display:none}
+.tut p{margin:0}
+/* ---------- compact commission row: picture, reward, swap ---------- */
+#paneOrders{width:min(400px,calc(100vw - 20px)) !important;max-height:none !important}
+#paneOrders .scroll{overflow:visible;padding-bottom:12px}
+#paneOrders .orders{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px !important;margin:0}
+#paneOrders .order.oc{padding:6px 6px 5px !important;display:flex;flex-direction:column;gap:5px}
+#paneOrders .order.oc .stage{display:block;width:100%;padding:2px}
+.ofoot{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:0 2px}
+.ofoot .reward{display:inline-flex;align-items:center;font-weight:800;font-size:1rem;color:#7a4c0e;margin:0 !important}
+.swapbtn{display:inline-flex;align-items:center;gap:2px;height:26px;padding:0 .45rem 0 .35rem;border-radius:999px;border:1px solid var(--edge);background:var(--panel);color:var(--muted);font:inherit;font-size:.78rem;font-weight:800;cursor:pointer}
+.swapbtn svg{width:14px;height:14px}
+.swapbtn .swc{display:inline-flex;align-items:center;margin-left:2px}
+.swapbtn .swc .ci{width:11px;height:11px;margin:0 1px 0 0;vertical-align:0}
+.ofoot{gap:2px !important;padding:0 !important}
+.ofoot .reward{font-size:.95rem !important;letter-spacing:-.01em}
+.ofoot .reward .ci{width:13px;height:13px;margin:0 2px 0 0}
+.swapbtn{padding:0 .38rem 0 .3rem !important;gap:1px !important;flex:none}
+.swapbtn svg{width:13px !important;height:13px !important}
+@media (max-width:360px){.swapbtn>svg{display:none}.swapbtn::before{content:'↻';font-size:.85rem;margin-right:1px}}
+#paneOrders .order.oc{position:relative}
+#paneOrders .swapbtn{position:absolute;top:-9px;right:-7px;z-index:2;height:24px;padding:0 .4rem 0 .32rem !important;background:var(--card) !important;border-color:var(--edge2) !important;box-shadow:0 2px 5px #5b432a2e}
+#paneOrders .orders{padding-top:6px}
+.ofoot{justify-content:center !important}
+.ofoot .reward{font-size:1.02rem !important}
+@media (max-width:360px){.swapbtn>svg{display:inline-block !important}.swapbtn::before{content:none !important}}
+.swapbtn:hover{background:#5b432a12;color:var(--ink)}
+.swapbtn:disabled{opacity:.45;cursor:not-allowed}
+.tut{cursor:pointer}
+.tut::before{content:'';position:absolute;top:-7px;left:var(--tx,50%);width:14px;height:14px;margin-left:-7px;background:var(--ink);transform:rotate(45deg);border-radius:2px}
+.tut .btn{display:block;margin-left:auto}
+@keyframes tutIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+#navOrders.pulse{animation:pulseRing 1.6s ease-out infinite}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 #c47a5f99,var(--shadow)}70%{box-shadow:0 0 0 10px #c47a5f00,var(--shadow)}100%{box-shadow:0 0 0 0 #c47a5f00,var(--shadow)}}
+@media (max-width:370px){
+  .topbar{gap:5px !important;padding-left:10px !important;padding-right:10px !important}
+  .topbar .stats{gap:5px !important}
+  .stat,.stat.rating{padding:.25rem .5rem .25rem .38rem !important;font-size:.88rem}
+  .stat svg{width:15px !important;height:15px !important}
+  .topbtn{font-size:.8rem !important;padding:0 .55rem 0 .45rem !important;gap:4px !important}
+  .topbtn svg{width:17px !important;height:17px !important}
+  .topbar .iconbtn{width:32px !important;height:32px !important}
+}
+@media (max-width:340px){.topbtn svg{display:none}.topbtn{padding:0 .6rem !important}}
+
+/* ---------- compare carousel ---------- */
+.cmp .car{min-width:0}
+.carwrap{position:relative}
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:12px;outline:none;overscroll-behavior-x:contain}
+.carousel::-webkit-scrollbar{display:none}
+.carousel:focus-visible{box-shadow:0 0 0 3px #c47a5f66}
+.slide{flex:0 0 100%;scroll-snap-align:center}
+.slide .stage{position:relative;display:block}
+.mpct{position:absolute;top:6px;left:6px;background:var(--card);border:1px solid var(--edge);border-radius:999px;padding:.05rem .45rem;font-size:.75rem;font-weight:800;color:var(--ink)}
+.carbtn{position:absolute;top:50%;z-index:2;width:34px;height:34px;margin-top:-17px;border-radius:50%;border:1px solid var(--edge2);background:var(--card);box-shadow:var(--shadow);
+  font-size:1.3rem;font-weight:800;line-height:1;color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.carbtn.prev{left:-10px}.carbtn.next{right:-10px}
+.carbtn:disabled{opacity:0;pointer-events:none}
+#carCap{display:flex;justify-content:center;align-items:baseline;gap:8px;margin-top:6px}
+#carCap b{color:var(--ink);font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#carCap span{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -815,7 +888,7 @@ body.is-dragging .dslot.filled.over{border-color:var(--rose) !important;box-shad
   <h1 id="title" class="sr-only" data-i18n="title">Moth Night</h1>
   <div class="stats">
     <span class="stat coin" id="coinStat" data-i18n-title="stat.coins"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#e7b84a" stroke="#a8761a" stroke-width="1.5"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#a8761a" stroke-width="1.2"/></svg><b id="coins">0</b></span>
-    <button class="stat rating" id="ratingStat" data-act="reviews" data-i18n-title="stat.rating"><span class="stars"><span class="fill" id="ratingFill"></span></span><b id="ratingNum">–</b></button>
+    <button class="stat rating" id="ratingStat" data-act="reviews" data-i18n-title="stat.rating"><span class="stars"><span class="fill" id="ratingFill"></span></span><span class="star1" aria-hidden="true"></span><b id="ratingNum">–</b></button>
   </div>
   <button class="topbtn" data-act="ordersToggle" data-spring="orders" id="navOrders" aria-controls="paneOrders" data-i18n-title="pane.orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10h7M8.5 14h7M8.5 18h4"/></svg><span class="lbl" data-i18n="pane.orders">Commissions</span><span class="badge" id="ordersBadge"></span></button>
   <button class="iconbtn" data-act="info" data-i18n-aria="help">?</button>
@@ -891,6 +964,7 @@ body.is-dragging .dslot.filled.over{border-color:var(--rose) !important;box-shad
 </aside>
 <dialog id="dlg" class="dlg" aria-label="Details"></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="tut" class="tut" role="note" data-act="ordersToggle" hidden><p id="tutText"></p></div>
 
 <script>
 const KEY='mothnight-v2', BOXCAP=20, MAXBOXES=10;
@@ -1100,6 +1174,10 @@ function render(){
   document.getElementById('navOrders').setAttribute('aria-pressed',!!state.ui.orders);
   document.getElementById('paneOrders').classList.toggle('open',!!state.ui.orders);
   placeOrders();
+  const tut=document.getElementById('tut'),showTut=!state.ui.tutDone&&!dlgState&&!state.ui.orders;
+  tut.hidden=!showTut;document.getElementById('navOrders').classList.toggle('pulse',showTut);
+  if(showTut){document.getElementById('tutText').textContent=t('tutOrders');placeTut()}
+  requestAnimationFrame(()=>{const tb=document.querySelector('.topbar');if(tb)document.documentElement.style.setProperty('--toph',tb.getBoundingClientRect().bottom+'px')});
   document.getElementById('navGarden').setAttribute('aria-pressed',state.ui.panel==='garden');
 
   const shown=inBox(cb.id);
@@ -1136,7 +1214,7 @@ function render(){
   const nsel=state.sel.filter(x=>byId(x)).length;
   document.getElementById('breedBadge').textContent=nsel?`${nsel}/2`:'';
   const [a,b]=state.sel.map(byId);
-  const pred=a&&b?predict(a,b):null;
+  const pred=null;
   const bb=document.getElementById('breedBtn');
   const free=totalFree();
   bb.disabled=!(a&&b)||free<=0;
@@ -1146,11 +1224,8 @@ function render(){
   let payable=0;
   document.getElementById('orders').innerHTML=state.orders.map((o,j)=>{
     const best=bestFor(o),bp=best?payout(o,best.s):0;if(bp)payable++;
-    return `<div class="order" data-drop="order:${o.id}" data-act="compare" data-id="${o.id}" role="button" tabindex="0" aria-label="${t('compare')}: ${clientName(o)}"><div class="otop"><span class="stage">${mothSVG(o.target,o.id)}</span><div>
-      <div class="who">${clientName(o)}</div><div class="reward">${COIN}${o.reward}</div>
-      ${best?`<div class="best">${t('best',{name:best.m.name,pct:pc(best.s)})}${bp?` (${COIN}${bp})`:''}</div>`:''}
-      ${pred?`<div class="chance" title="${t('pairTitle')}">${t('pair',{avg:pc(pred[j].avg),hi:pred[j].hi<.005&&pred[j].hi>0?'<1%':pc(pred[j].hi)})}</div>`:''}
-      </div></div><div class="foot"><button class="linkbtn" data-act="swap" data-id="${o.id}" ${state.coins<COST.swap?'disabled':''} aria-label="${t('swapAria',{n:COST.swap})}">${t('swap')} ${COIN}${COST.swap}</button></div></div>`;
+    return `<div class="order oc" data-drop="order:${o.id}" data-act="compare" data-id="${o.id}" role="button" tabindex="0" aria-label="${t('compare')}: ${clientName(o)}, ${o.reward}"><span class="stage">${mothSVG(o.target,o.id)}</span>
+      <div class="ofoot"><span class="reward">${COIN}${o.reward}</span><button class="swapbtn" data-act="swap" data-id="${o.id}" ${state.coins<COST.swap?'disabled':''} aria-label="${t('swapAria',{n:COST.swap})}" title="${t('swapAria',{n:COST.swap})}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7"/><path d="M20 4v4.7h-4.7"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.3"/><path d="M4 20v-4.7h4.7"/></svg><span class="swc">${COIN}${COST.swap}</span></button></div></div>`;
   }).join('');
   document.getElementById('ordersBadge').textContent=payable||'';
   syncGarden();
@@ -1182,15 +1257,14 @@ function renderDialog(){
     let cur=ranked.find(x=>x.m.id===dlgState.mid)||ranked[0];
     html=`<div class="dhead"><div><h3>${clientName(o)}</h3><div class="meta">${t('paysUpTo',{n:o.reward})}</div></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>
       <div class="cmp"><figure><span class="stage">${mothSVG(o.target,o.id)}</span><figcaption>${t('want')}</figcaption></figure>
-      <figure>${cur?`<span class="stage">${mothSVG(phen(cur.m.genes),cur.m.id)}</span>
-        <select id="cmpSel" aria-label="${t('mothToCompare')}">${ranked.map(x=>`<option value="${x.m.id}" ${x.m.id===cur.m.id?'selected':''}>${x.m.name} (${pc(x.s)})</option>`).join('')}</select>`
-        :`<div class="empty">${t('noMoths')}</div>`}</figure></div>`;
-    if(cur){
-      const pay=payout(o,cur.s);
-      html+=`<div class="score"><strong>${t('match',{pct:pc(cur.s)})}</strong></div>
-      <div class="quote"><p>“${clientQuote(o,cur.m,cur.s,pay)}”</p><span>${clientName(o)}</span></div>
-      <div class="dacts"><button class="btn primary" data-act="deliver" data-id="${o.id}" data-mid="${cur.m.id}" ${pay?'':'disabled'}>${pay?t('deliverFor',{name:cur.m.name,n:pay}):t('deliver',{name:cur.m.name})}</button></div>`;
-    }
+      <figure class="car">${cur?`<div class="carwrap">
+          <button class="carbtn prev" data-act="carStep" data-dir="-1" aria-label="${t('scrollLeft')}">‹</button>
+          <div class="carousel" id="carousel" tabindex="0" aria-label="${t('mothToCompare')}">${ranked.map((x,i)=>`<div class="slide" data-i="${i}"><span class="stage">${mothSVG(phen(x.m.genes),x.m.id)}<span class="mpct">${pc(x.s)}</span></span></div>`).join('')}</div>
+          <button class="carbtn next" data-act="carStep" data-dir="1" aria-label="${t('scrollRight')}">›</button></div>
+          <figcaption id="carCap"></figcaption>`
+        :`<div class="empty">${t('noMoths')}</div>`}</figure></div>
+      <div id="cmpLive"></div>`;
+    dlgState.ranked=ranked.map(x=>x.m.id);dlgState.idx=Math.max(0,ranked.indexOf(cur));
   }else if(dlgState.t==='reviews'){
     const rt=shopRating();
     html=`<div class="dhead"><div><h3>${t('reviewsTitle')}</h3></div><button class="x" data-act="close" aria-label="${t('close')}">×</button></div>`;
@@ -1218,6 +1292,7 @@ function renderDialog(){
       ${!canDel&&state.boxes.length>1?`<p class="subnote" style="margin-top:10px">${t('deleteHint')}</p>`:''}`;
   }
   dlg.innerHTML=html;
+  if(dlgState&&dlgState.t==='order')initCarousel();
   if(!dlg.open)dlg.showModal();
 }
 
@@ -1226,13 +1301,15 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const act=el.dataset.act,id=+el.dataset.id;
   if(act.startsWith('dev'))return;
+  if(act==='carStep'){carStep(+el.dataset.dir);return}
   if(act==='details')dlgState={t:'moth',id};
   else if(act==='compare')dlgState={t:'order',id};
   else if(act==='garden')state.ui.panel='garden';
   else if(act==='info')dlgState={t:'info'};
   else if(act==='reviews')dlgState={t:'reviews'};
   else if(act==='nav'){const pnl=el.dataset.panel;state.ui.panel=(pnl&&state.ui.panel===pnl)?'':pnl}
-  else if(act==='ordersToggle')state.ui.orders=!state.ui.orders;
+  else if(act==='ordersToggle'){state.ui.orders=!state.ui.orders;state.ui.tutDone=true}
+  else if(act==='tutOk')state.ui.tutDone=true;
   else if(act==='closePanel'){if(el.closest('#paneOrders'))state.ui.orders=false;else state.ui.panel=''}
   else if(act==='box'){if(state.ui.box===id)dlgState={t:'box',id};else state.ui.box=id}
   else if(act==='boxScroll'){const bar=document.getElementById('boxbar');bar.scrollBy({left:(+el.dataset.dir)*Math.max(120,bar.clientWidth*.7)});return}
@@ -1428,6 +1505,7 @@ function catchVisitor(vid){
 /* ---------- localization ---------- */
 const I18N={
 en:{
+  tutOrders:'Customers post commissions here. Tap to see the moths they want and how much they pay.',gotIt:'Got it',
   'stat.rating':'Shop rating',reviewsTitle:'Shop reviews',outOf:'out of 5',basedOn:'{n} deliveries, {pct} average match',basedOnOne:'1 delivery, {pct} match',
   noReviews:'No reviews yet. Deliver a commission to get your first one.',
   reviews:[
@@ -1469,8 +1547,7 @@ en:{
     <h4>Breeding</h4>
     <ul><li>Tap Breeding below your moths, tap two moths to put them in the slots, then tap Breed. You get 2 or 3 eggs.</li>
     <li>Babies mix their parents' traits, and siblings can turn out quite different. Keep pairing the closest ones to get nearer to what you need.</li>
-    <li>Some traits, like tails or eyespots, can stay hidden and appear in a later generation.</li>
-    <li>With two parents in the slots, each commission shows how well a typical egg would match.</li></ul>
+    <li>Some traits, like tails or eyespots, can stay hidden and appear in a later generation.</li></ul>
     <h4>Commissions</h4>
     <ul><li>Tap Commissions at the top, from any screen, then tap a commission to compare it with your moths and deliver one.</li>
     <li>Don't like a commission? Swap it for a new one for ${p.swap} coins.</li></ul>
@@ -1487,6 +1564,7 @@ en:{
     great:['Perfect, exactly what I pictured! Here’s {c}.','That’s the one! Take {c}, you’ve earned it.','Wonderful, just as I imagined. {c} for you.']}
 },
 es:{
+  tutOrders:'Aquí verás los encargos de los clientes. Tócalo para ver qué polillas quieren y cuánto pagan.',gotIt:'Entendido',
   'stat.rating':'Valoración de la tienda',reviewsTitle:'Opiniones de la tienda',outOf:'de 5',basedOn:'{n} entregas, {pct} de coincidencia media',basedOnOne:'1 entrega, {pct} de coincidencia',
   noReviews:'Aún no hay opiniones. Entrega un encargo para recibir la primera.',
   reviews:[
@@ -1528,8 +1606,7 @@ es:{
     <h4>Cría</h4>
     <ul><li>Toca Cría debajo de tus polillas, toca dos polillas para ponerlas en los huecos y pulsa Criar. Nacen 2 o 3 huevos.</li>
     <li>Las crías mezclan los rasgos de sus progenitores, y los hermanos pueden salir muy distintos. Sigue cruzando las que más se acerquen para llegar a lo que necesitas.</li>
-    <li>Algunos rasgos, como las colas o los ocelos, pueden quedar ocultos y aparecer en una generación posterior.</li>
-    <li>Con dos progenitores en los huecos, cada encargo muestra cuánto se parecería un huevo típico.</li></ul>
+    <li>Algunos rasgos, como las colas o los ocelos, pueden quedar ocultos y aparecer en una generación posterior.</li></ul>
     <h4>Encargos</h4>
     <ul><li>Toca Encargos arriba, desde cualquier pantalla, y luego toca un encargo para compararlo con tus polillas y entregar una.</li>
     <li>¿No te convence un encargo? Cámbialo por otro por ${p.swap} monedas.</li></ul>
@@ -1594,6 +1671,39 @@ function clientQuote(o,m,s,pay){
   const f=pay/o.reward,tier=!pay?'none':f<.25?'low':f<.55?'mid':f<.85?'good':'great';
   const list=t('quotes')[tier],seed=(o.id*31+m.id*17)%997;
   return list[seed%list.length].replace('{c}',`<b>${COIN}${pay}</b>`);
+}
+
+/* ---------- compare carousel ---------- */
+function updateCmpLive(){
+  const o=state.orders.find(x=>x.id===dlgState.id),live=document.getElementById('cmpLive'),cap=document.getElementById('carCap');
+  if(!o||!live)return;
+  const m=byId(dlgState.ranked[dlgState.idx]);if(!m){live.innerHTML='';return}
+  dlgState.mid=m.id;
+  const sc=match(phen(m.genes),o.target),pay=payout(o,sc);
+  cap.innerHTML=`<b>${esc(m.name)}</b> <span>${dlgState.idx+1} / ${dlgState.ranked.length}</span>`;
+  live.innerHTML=`<div class="score"><strong>${t('match',{pct:pc(sc)})}</strong></div>
+    <div class="quote"><p>“${clientQuote(o,m,sc,pay)}”</p><span>${clientName(o)}</span></div>
+    <div class="dacts"><button class="btn primary" data-act="deliver" data-id="${o.id}" data-mid="${m.id}" ${pay?'':'disabled'}>${pay?t('deliverFor',{name:m.name,n:pay}):t('deliver',{name:m.name})}</button></div>`;
+  const pr=document.querySelector('.carbtn.prev'),nx=document.querySelector('.carbtn.next');
+  if(pr)pr.disabled=dlgState.idx<=0;if(nx)nx.disabled=dlgState.idx>=dlgState.ranked.length-1;
+}
+function initCarousel(){
+  const c=document.getElementById('carousel');
+  if(!c){const live=document.getElementById('cmpLive');if(live)live.innerHTML='';return}
+  const go=()=>{c.scrollLeft=dlgState.idx*c.clientWidth;updateCmpLive()};
+  go();requestAnimationFrame(go);
+  let tm=0;
+  c.addEventListener('scroll',()=>{clearTimeout(tm);tm=setTimeout(()=>{
+    if(!dlgState||dlgState.t!=='order')return;
+    const i=Math.max(0,Math.min(dlgState.ranked.length-1,Math.round(c.scrollLeft/c.clientWidth)));
+    if(i!==dlgState.idx){dlgState.idx=i;updateCmpLive()}
+  },70)},{passive:true});
+  c.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();carStep(e.key==='ArrowLeft'?-1:1)}});
+}
+function carStep(dir){
+  const c=document.getElementById('carousel');if(!c||!dlgState)return;
+  const i=Math.max(0,Math.min(dlgState.ranked.length-1,dlgState.idx+dir));
+  c.scrollTo({left:i*c.clientWidth,behavior:'smooth'});
 }
 
 /* ---------- tap modes ---------- */
@@ -1839,10 +1949,17 @@ function placeOrders(){
   const left=Math.max(10,Math.min(vw-w-10,cx-w/2));
   po.style.left=left+'px';po.style.top=(r.bottom+12)+'px';po.style.setProperty('--ax',Math.max(22,Math.min(w-22,cx-left))+'px');
 }
-window.addEventListener('resize',placeOrders);
+function placeTut(){
+  const tut=document.getElementById('tut'),nb=document.getElementById('navOrders');if(!tut||tut.hidden||!nb)return;
+  const vw=window.innerWidth,w=Math.min(270,vw-20),r=nb.getBoundingClientRect(),cx=r.left+r.width/2;
+  const left=Math.max(10,Math.min(vw-w-10,cx-w/2));
+  tut.style.width=w+'px';tut.style.left=left+'px';tut.style.top=(r.bottom+14)+'px';
+  tut.style.setProperty('--tx',Math.max(18,Math.min(w-18,cx-left))+'px');
+}
+window.addEventListener('resize',()=>{placeOrders();placeTut()});
 document.addEventListener('click',e=>{
   if(!state.ui.orders)return;
-  if(e.target.closest&&e.target.closest('#paneOrders,#navOrders,dialog,#toast,#dev'))return;
+  if(e.target.closest&&e.target.closest('#paneOrders,#navOrders,dialog,#toast,#dev,#tut'))return;
   state.ui.orders=false;render();
 },true);
 document.addEventListener('keydown',e=>{
