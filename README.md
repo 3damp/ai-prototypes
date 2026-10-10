@@ -7,6 +7,7 @@ Small experiments built with AI. Each prototype is a self-contained folder serve
 | Prototype | Description | Play |
 | --- | --- | --- |
 | [Moth Night](moth-breeding-game/) | Breed moths for wing traits and fill collectors' orders | [Play](https://3damp.github.io/ai-prototypes/moth-breeding-game/) |
+| [Paint Mixer](paint-mixer/) | Drag paint into dishes and mix colours like real pigment | [Play](https://3damp.github.io/ai-prototypes/paint-mixer/) |
 
 ## Adding a prototype
 

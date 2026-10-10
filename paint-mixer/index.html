@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paint Mixer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mixbox@2.0.0/mixbox.js"></script>
+<style>
+:root{
+  --table:#D7DBD5; --surface:#ECEEEA; --ink:#22262A; --muted:#62686E;
+  --well:#F8F9F6; --rim:#C3C8C1; --focus:#2F5BD3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --table:#1D2023; --surface:#272B2F; --ink:#E7E9E4; --muted:#9AA0A5;
+    --well:#EDEEEA; --rim:#3A3F44; --focus:#8EAEFF;
+  }
+}
+:root[data-theme="dark"]{
+  --table:#1D2023; --surface:#272B2F; --ink:#E7E9E4; --muted:#9AA0A5;
+  --well:#EDEEEA; --rim:#3A3F44; --focus:#8EAEFF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--table); color:var(--ink);
+  font-family:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  font-size:1rem; line-height:1.4;
+  -webkit-tap-highlight-color:transparent; overscroll-behavior:none;
+}
+main{max-width:560px; margin:0 auto; padding:1rem; min-height:100%; display:flex; flex-direction:column; gap:.9rem}
+header{display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap}
+h1{font-size:1.5rem; line-height:1.1; margin:0; font-weight:700; letter-spacing:-.02em}
+.lede{margin:0; color:var(--muted); font-size:.85rem}
+
+/* Pigments */
+.pigments{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.4rem;
+  padding:.6rem; background:var(--surface); border-radius:16px;
+}
+.pigment{
+  all:unset; cursor:grab; display:flex; justify-content:center; align-items:center;
+  touch-action:none; user-select:none; -webkit-user-select:none; padding:.3rem; border-radius:10px;
+}
+.pigment:focus-visible{outline:2px solid var(--focus); outline-offset:1px}
+.pigment.selected .blob{transform:scale(1.12); box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.blob{
+  width:100%; max-width:52px; aspect-ratio:1; border-radius:58% 42% 55% 45% / 52% 60% 40% 48%;
+  background:var(--c);
+  box-shadow:inset -4px -6px 10px rgba(0,0,0,.18), inset 4px 5px 8px rgba(255,255,255,.28), 0 1px 0 rgba(0,0,0,.08);
+  transition:transform .15s ease;
+}
+.pigment:nth-child(2n) .blob{border-radius:45% 55% 48% 52% / 60% 44% 56% 40%}
+.pigment:nth-child(3n) .blob{border-radius:52% 48% 40% 60% / 46% 54% 46% 54%}
+.pigment:active .blob{transform:scale(.94)}
+.white-blob{outline:1px solid var(--rim)}
+
+/* Dishes */
+.dishes{display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem}
+.dish-card{background:var(--surface); border-radius:16px; padding:.7rem .5rem .55rem; display:flex; flex-direction:column; align-items:center; gap:.45rem; min-width:0}
+.dish{
+  all:unset; position:relative; display:block; width:calc(100% - 12px); aspect-ratio:1; border-radius:50%;
+  background:var(--well); cursor:pointer; touch-action:none; user-select:none; -webkit-user-select:none;
+  box-shadow:0 0 0 6px var(--rim), inset 0 4px 10px rgba(0,0,0,.14);
+  margin:6px; overflow:hidden;
+  transition:box-shadow .15s ease, transform .15s ease;
+}
+.dish:focus-visible{outline:3px solid var(--focus); outline-offset:8px}
+.dish.hover{transform:scale(1.04); box-shadow:0 0 0 6px var(--ink), inset 0 4px 10px rgba(0,0,0,.14)}
+.dish.draggable{cursor:grab}
+.paint{
+  position:absolute; inset:9%; border-radius:50%; background:var(--mix,transparent);
+  transition:background-color .5s ease, transform .4s ease, opacity .3s;
+  opacity:0; transform:scale(.6);
+  box-shadow:inset -8px -10px 18px rgba(0,0,0,.18), inset 6px 8px 14px rgba(255,255,255,.22);
+}
+.dish.filled .paint{opacity:1; transform:scale(1)}
+.dab{
+  position:absolute; width:36px; height:36px; margin:-18px 0 0 -18px; border-radius:50%;
+  pointer-events:none; animation:dab .7s ease-out forwards;
+}
+@keyframes dab{
+  0%{transform:scale(.4); opacity:1}
+  45%{transform:scale(1.4); opacity:.95}
+  100%{transform:scale(3.2) rotate(140deg); opacity:0}
+}
+.swirl{animation:swirl .55s ease}
+@keyframes swirl{0%{transform:scale(1) rotate(0)}40%{transform:scale(.96) rotate(-8deg)}100%{transform:scale(1) rotate(0)}}
+
+.readout{display:flex; flex-direction:column; align-items:center; line-height:1.2}
+.hex{font-size:.85rem; font-weight:700; letter-spacing:.02em; font-variant-numeric:tabular-nums}
+.parts{color:var(--muted); font-size:.7rem; min-height:1.2em}
+.bar{display:flex; width:100%; height:6px; border-radius:3px; overflow:hidden; background:var(--table)}
+.bar span{display:block; height:100%; transition:flex-grow .4s ease}
+.actions{display:flex; gap:.4rem}
+.btn{
+  font:inherit; font-size:.95rem; width:34px; height:34px; padding:0; border-radius:50%; cursor:pointer;
+  border:1px solid var(--rim); background:transparent; color:var(--ink); display:grid; place-items:center;
+}
+.btn:hover:not(:disabled){background:var(--table)}
+.btn:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+.btn:disabled{opacity:.35; cursor:default}
+
+.ghost{
+  position:fixed; left:0; top:0; width:52px; height:52px; margin:-26px 0 0 -26px; border-radius:50%;
+  pointer-events:none; z-index:50; box-shadow:0 10px 24px rgba(0,0,0,.28), inset -4px -6px 10px rgba(0,0,0,.18);
+}
+.note{margin:auto 0 0; font-size:.7rem; color:var(--muted)}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+@media (prefers-reduced-motion: reduce){
+  .dab,.swirl{animation:none}
+  .paint,.bar span,.blob,.dish{transition:none}
+}
+
+/* Tabs + custom palette */
+.palette{display:flex; flex-direction:column; gap:.5rem}
+.tabbar{display:flex; align-items:center; gap:.25rem}
+.tab{
+  all:unset; cursor:pointer; font-size:.85rem; font-weight:500; padding:.35rem .8rem; border-radius:999px; color:var(--muted);
+}
+.tab[aria-selected="true"]{background:var(--surface); color:var(--ink)}
+.tab:focus-visible{outline:2px solid var(--focus); outline-offset:1px}
+.edit-toggle{all:unset; margin-left:auto; cursor:pointer; font-size:.8rem; color:var(--muted); padding:.35rem .6rem; border-radius:999px}
+.edit-toggle[hidden]{display:none}
+.edit-toggle[aria-pressed="true"]{color:var(--ink); background:var(--surface)}
+.edit-toggle:focus-visible{outline:2px solid var(--focus)}
+.pigment{position:relative}
+.del{
+  all:unset; position:absolute; top:0; right:0; width:22px; height:22px; border-radius:50%;
+  background:var(--ink); color:var(--surface); font-size:.7rem; display:grid; place-items:center; cursor:pointer;
+}
+.del:focus-visible{outline:2px solid var(--focus)}
+.del{z-index:2}
+.edit-swatch{position:relative; display:flex; justify-content:center; align-items:center; padding:.3rem; border-radius:10px; cursor:pointer}
+.edit-swatch input{position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; border:0; padding:0}
+.edit-swatch:focus-within{outline:2px solid var(--focus); outline-offset:1px}
+.editing .blob{animation:wiggle .3s ease-in-out infinite alternate}
+@keyframes wiggle{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.add{
+  position:relative; display:flex; justify-content:center; align-items:center; padding:.3rem; border-radius:10px; cursor:pointer;
+}
+.add .blob{
+  background:transparent; box-shadow:none; border:2px dashed var(--rim); display:grid; place-items:center;
+  font-size:1.5rem; color:var(--muted); border-radius:50%;
+}
+.add:hover .blob{border-color:var(--muted); color:var(--ink)}
+.add input{position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; border:0; padding:0}
+.add:focus-within{outline:2px solid var(--focus); outline-offset:1px}
+.empty-msg{grid-column:2 / -1; align-self:center; font-size:.8rem; color:var(--muted)}
+@media (prefers-reduced-motion: reduce){ .editing .blob{animation:none} }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Paint Mixer</h1>
+    <p class="lede">Drag paint into a dish. Keep adding to mix.</p>
+  </header>
+
+  <div class="palette">
+    <div class="tabbar" role="tablist" aria-label="Palettes">
+      <button class="tab" role="tab" id="tab-basic" aria-selected="true" aria-controls="pigments" data-tab="basic">Basic</button>
+      <button class="tab" role="tab" id="tab-custom" aria-selected="false" aria-controls="pigments" data-tab="custom" tabindex="-1">Custom</button>
+      <button class="edit-toggle" id="edit-toggle" type="button" aria-pressed="false" hidden>Edit</button>
+    </div>
+    <div class="pigments" id="pigments" role="tabpanel" aria-labelledby="tab-basic"></div>
+  </div>
+
+  <div class="dishes" id="dishes" role="group" aria-label="Mixing dishes"></div>
+
+  <p class="note" id="note">Mixes like real pigment (Mixbox), so blue and yellow make green.</p>
+  <div class="sr" aria-live="polite" id="live"></div>
+</main>
+
+<script>
+const BASIC = [
+  {id:"b-red", name:"Red", hex:"#E8160C"},
+  {id:"b-blue", name:"Blue", hex:"#0A3BA8"},
+  {id:"b-yellow", name:"Yellow", hex:"#FEEC00"},
+  {id:"b-green", name:"Green", hex:"#0A9A3C"},
+  {id:"b-cyan", name:"Cyan", hex:"#00AEEF"},
+  {id:"b-magenta", name:"Magenta", hex:"#E6007E"},
+  {id:"b-black", name:"Black", hex:"#1A1A1A"},
+  {id:"b-white", name:"White", hex:"#FFFFFF"},
+];
+const DISH_COUNT = 3, MAX_CUSTOM = 11, STORE_KEY = "paint-mixer-custom";
+
+const hasMixbox = typeof window.mixbox !== "undefined";
+if(!hasMixbox){
+  document.getElementById("note").textContent = "The pigment model couldn't load, so colors are blended as light instead of paint. Reload to try again.";
+}
+const hexToRgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const rgbToHex = c => "#"+c.map(v=>Math.round(v).toString(16).padStart(2,"0")).join("").toUpperCase();
+const lin = v => {v/=255; return v<=.04045? v/12.92 : Math.pow((v+.055)/1.055,2.4)};
+const unlin = v => 255*(v<=.0031308? v*12.92 : 1.055*Math.pow(v,1/2.4)-.055);
+
+/* Every color ever used, keyed by id. Kept even after a custom color is deleted so dishes still work. */
+const COLORS = {};
+function register(c){
+  if(COLORS[c.id]) return;
+  const rgb = hexToRgb(c.hex);
+  COLORS[c.id] = {...c, latent: hasMixbox ? Array.from(mixbox.rgbToLatent(rgb)) : rgb.map(lin)};
+}
+BASIC.forEach(register);
+
+let custom = [];
+try{ const raw = localStorage.getItem(STORE_KEY); if(raw) custom = JSON.parse(raw).filter(c=>/^#[0-9A-F]{6}$/i.test(c.hex)); }catch(_){}
+custom.forEach(register);
+function saveCustom(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(custom.map(({id,name,hex})=>({id,name,hex})))); }catch(_){} }
+
+function mixRecipe(recipe){
+  const ids = Object.keys(recipe); if(!ids.length) return null;
+  const total = ids.reduce((s,n)=>s+recipe[n],0);
+  const z = new Array(COLORS[ids[0]].latent.length).fill(0);
+  ids.forEach(id=>{ const w=recipe[id]/total; COLORS[id].latent.forEach((v,i)=>z[i]+=w*v); });
+  const rgb = hasMixbox ? Array.from(mixbox.latentToRgb(z)) : z.map(unlin);
+  return rgbToHex(rgb.map(v=>Math.max(0,Math.min(255,v))));
+}
+
+/* ---------- palette tabs ---------- */
+const pigWrap = document.getElementById("pigments");
+const editBtn = document.getElementById("edit-toggle");
+let tab = "basic", editing = false;
+
+function editSwatch(c){
+  const l = document.createElement("label");
+  l.className = "edit-swatch"; l.title = `Change ${c.name}`;
+  l.innerHTML = `<span class="blob ${c.hex==="#FFFFFF"?"white-blob":""}" style="--c:${c.hex}"></span><input type="color" value="${c.hex.toLowerCase()}" aria-label="Change color ${c.name}">`;
+  const input = l.querySelector("input"), blob = l.querySelector(".blob");
+  input.addEventListener("input", ()=>blob.style.setProperty("--c", input.value));
+  input.addEventListener("change", ()=>updateCustom(c.id, input.value));
+  const x = document.createElement("span");
+  x.className="del"; x.textContent="✕"; x.setAttribute("role","button"); x.tabIndex=0;
+  x.setAttribute("aria-label", `Remove ${c.name}`); x.dataset.del = c.id;
+  l.appendChild(x);
+  return l;
+}
+function updateCustom(id, hex){
+  hex = hex.toUpperCase();
+  const i = custom.findIndex(c=>c.id===id); if(i<0) return;
+  if(custom[i].hex===hex) return;
+  if(custom.some(c=>c.hex===hex)){ live.textContent = `${hex} is already in your palette.`; renderPalette(); return; }
+  // New id, so dishes already using the old color keep their mix.
+  const c = {id:"c-"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), name:hex, hex};
+  register(c); custom[i] = c; saveCustom(); renderPalette();
+  live.textContent = `Changed to ${hex}.`;
+}
+function pigmentButton(c, removable){
+  if(removable && editing) return editSwatch(c);
+  const b = document.createElement("button");
+  b.className = "pigment"; b.type="button"; b.dataset.id = c.id; b.title = c.name;
+  b.setAttribute("aria-label", `${c.name}. Drag into a dish, or press to pick it up.`);
+  b.innerHTML = `<span class="blob ${c.hex==="#FFFFFF"?"white-blob":""}" style="--c:${c.hex}"></span>`;
+  return b;
+}
+function renderPalette(){
+  clearSelection();
+  pigWrap.innerHTML = "";
+  pigWrap.classList.toggle("editing", tab==="custom" && editing);
+  pigWrap.setAttribute("aria-labelledby", "tab-"+tab);
+  document.querySelectorAll(".tab").forEach(t=>{
+    const on = t.dataset.tab===tab;
+    t.setAttribute("aria-selected", on); t.tabIndex = on?0:-1;
+  });
+  editBtn.hidden = !(tab==="custom" && custom.length);
+  if(!custom.length) editing = false;
+  editBtn.setAttribute("aria-pressed", editing); editBtn.textContent = editing ? "Done" : "Edit";
+
+  if(tab==="basic"){ BASIC.forEach(c=>pigWrap.appendChild(pigmentButton(c,false))); return; }
+
+  custom.forEach(c=>pigWrap.appendChild(pigmentButton(c,true)));
+  if(custom.length < MAX_CUSTOM && !editing){
+    const add = document.createElement("label");
+    add.className="add"; add.title="Add a color";
+    add.innerHTML = `<span class="blob" aria-hidden="true">+</span><input type="color" value="#7A4FD0" aria-label="Pick a color to add">`;
+    const input = add.querySelector("input");
+    input.addEventListener("change", ()=>addCustom(input.value));
+    pigWrap.appendChild(add);
+  }
+  if(!custom.length){
+    const m = document.createElement("p"); m.className="empty-msg"; m.textContent="Tap + to add your own colors. In Edit, tap a color to change it.";
+    pigWrap.appendChild(m);
+  }
+}
+function addCustom(hex){
+  hex = hex.toUpperCase();
+  if(custom.some(c=>c.hex===hex)){ live.textContent = `${hex} is already in your palette.`; return; }
+  const c = {id:"c-"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), name:hex, hex};
+  register(c); custom.push(c); saveCustom(); renderPalette();
+  live.textContent = `${hex} added to your palette.`;
+}
+function removeCustom(id){
+  custom = custom.filter(c=>c.id!==id); saveCustom(); renderPalette();
+  const next = pigWrap.querySelector(".del") || editBtn; if(!editBtn.hidden || next!==editBtn) next.focus();
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click", ()=>{ tab=t.dataset.tab; editing=false; renderPalette(); }));
+document.querySelector(".tabbar").addEventListener("keydown", e=>{
+  if(e.key!=="ArrowLeft" && e.key!=="ArrowRight") return;
+  if(!e.target.classList.contains("tab")) return;
+  tab = tab==="basic" ? "custom" : "basic"; editing=false; renderPalette();
+  document.getElementById("tab-"+tab).focus();
+});
+editBtn.addEventListener("click", ()=>{ editing=!editing; renderPalette(); });
+pigWrap.addEventListener("click", e=>{
+  const d = e.target.closest("[data-del]"); if(d){ e.preventDefault(); e.stopPropagation(); removeCustom(d.dataset.del); }
+});
+
+/* ---------- dishes ---------- */
+const dishes = [];
+const dishWrap = document.getElementById("dishes");
+const live = document.getElementById("live");
+for(let i=0;i<DISH_COUNT;i++){
+  const card = document.createElement("section");
+  card.className="dish-card";
+  card.innerHTML = `
+    <button class="dish" type="button" data-dish="${i}" aria-label="Dish ${i+1}, empty">
+      <span class="paint"></span>
+    </button>
+    <div class="readout"><span class="hex">Empty</span><span class="parts"></span></div>
+    <div class="bar" aria-hidden="true"></div>
+    <div class="actions">
+      <button class="btn undo" type="button" disabled aria-label="Undo last dab" title="Undo">↶</button>
+      <button class="btn clear" type="button" disabled aria-label="Clear dish" title="Clear">✕</button>
+    </div>`;
+  dishWrap.appendChild(card);
+  const d = {i, card, el:card.querySelector(".dish"), recipe:{}, history:[], color:null};
+  card.querySelector(".undo").onclick = ()=>{ if(d.history.length){ d.recipe=d.history.pop(); render(d,true);} };
+  card.querySelector(".clear").onclick = ()=>{ d.history.push({...d.recipe}); d.recipe={}; render(d,true); };
+  dishes.push(d);
+}
+const fmt = n => Number.isInteger(n)? n : n.toFixed(1);
+function render(d, animate){
+  const total = Object.values(d.recipe).reduce((s,v)=>s+v,0);
+  d.color = mixRecipe(d.recipe);
+  const paint = d.el.querySelector(".paint");
+  d.el.classList.toggle("filled", !!d.color);
+  d.el.classList.toggle("draggable", !!d.color);
+  if(d.color) paint.style.setProperty("--mix", d.color);
+  if(animate && d.color){ paint.classList.remove("swirl"); void paint.offsetWidth; paint.classList.add("swirl"); }
+  const sorted = Object.entries(d.recipe).sort((a,b)=>b[1]-a[1]);
+  const recipeText = sorted.map(([id,v])=>fmt(v)+" "+COLORS[id].name).join(", ");
+  d.card.querySelector(".hex").textContent = d.color || "Empty";
+  d.el.title = recipeText;
+  d.card.querySelector(".parts").textContent = total? `${fmt(total)} ${total===1?"dab":"dabs"}` : "\u00a0";
+  d.card.querySelector(".bar").innerHTML = sorted.map(([id,v])=>`<span title="${COLORS[id].name}" style="flex-grow:${v};background:${COLORS[id].hex}"></span>`).join("");
+  d.card.querySelector(".undo").disabled = !d.history.length;
+  d.card.querySelector(".clear").disabled = !total;
+  d.el.setAttribute("aria-label", d.color ? `Dish ${d.i+1}, ${d.color}, made of ${recipeText}` : `Dish ${d.i+1}, empty`);
+}
+dishes.forEach(d=>render(d,false));
+
+function addToDish(d, source, pt){
+  let addition;
+  if(source.type==="pigment") addition = {[source.id]:1};
+  else {
+    if(source.d===d || !source.d.color) return;
+    const t = Object.values(source.d.recipe).reduce((s,v)=>s+v,0);
+    addition = {}; for(const [n,v] of Object.entries(source.d.recipe)) addition[n]=v/t;
+  }
+  d.history.push({...d.recipe});
+  for(const [n,v] of Object.entries(addition)) d.recipe[n]=(d.recipe[n]||0)+v;
+  spawnDab(d, source.color, pt);
+  render(d,true);
+  live.textContent = `Added to dish ${d.i+1}. Now ${d.color}.`;
+}
+function spawnDab(d, color, pt){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = d.el.getBoundingClientRect();
+  const x = pt ? pt.x - r.left : r.width/2, y = pt ? pt.y - r.top : r.height/2;
+  const dab = document.createElement("span");
+  dab.className="dab"; dab.style.left=x+"px"; dab.style.top=y+"px"; dab.style.background=color;
+  d.el.appendChild(dab);
+  dab.addEventListener("animationend",()=>dab.remove());
+}
+
+/* ---------- drag with pointer events (mouse + touch) ---------- */
+let drag=null, selected=null;
+function sourceFromEl(el){
+  if(el.closest(".del")) return null;
+  const pig = el.closest(".pigment");
+  if(pig){ const c = COLORS[pig.dataset.id]; return {type:"pigment", id:c.id, name:c.name, el:pig, color:c.hex}; }
+  const dish = el.closest(".dish");
+  if(dish){ const d=dishes[+dish.dataset.dish]; if(d.color) return {type:"dish", d, el:dish, color:d.color}; }
+  return null;
+}
+function dishAt(x,y){
+  const el = document.elementFromPoint(x,y);
+  const dish = el && el.closest(".dish");
+  return dish ? dishes[+dish.dataset.dish] : null;
+}
+document.addEventListener("pointerdown", e=>{
+  if(e.button!==0) return;
+  const src = sourceFromEl(e.target); if(!src) return;
+  drag = {src, x0:e.clientX, y0:e.clientY, moved:false, ghost:null, over:null, id:e.pointerId};
+  try{ e.target.setPointerCapture(e.pointerId); }catch(_){}
+});
+document.addEventListener("pointermove", e=>{
+  if(!drag || e.pointerId!==drag.id) return;
+  if(!drag.moved && Math.hypot(e.clientX-drag.x0, e.clientY-drag.y0) > 6){
+    drag.moved = true;
+    const g = document.createElement("div"); g.className="ghost"; g.style.background=drag.src.color;
+    document.body.appendChild(g); drag.ghost=g; clearSelection();
+  }
+  if(drag.moved){
+    const d = dishAt(e.clientX,e.clientY);
+    const valid = d && !(drag.src.type==="dish" && drag.src.d===d);
+    if(drag.over && drag.over!==d) drag.over.el.classList.remove("hover");
+    drag.over = valid? d : null;
+    if(drag.over) drag.over.el.classList.add("hover");
+    drag.ghost.style.transform=`translate(${e.clientX}px,${e.clientY}px)` + (valid? " scale(1.15)" : "");
+  }
+});
+function endDrag(e, cancelled){
+  if(!drag || e.pointerId!==drag.id) return;
+  const {src, moved, ghost, over} = drag;
+  if(ghost) ghost.remove();
+  if(over) over.el.classList.remove("hover");
+  drag=null;
+  if(cancelled) return;
+  if(moved){ if(over) addToDish(over, src, {x:e.clientX,y:e.clientY}); return; }
+  handleTap(src, e);
+}
+document.addEventListener("pointerup", e=>endDrag(e,false));
+document.addEventListener("pointercancel", e=>endDrag(e,true));
+
+/* ---------- tap / keyboard: pick up, then place ---------- */
+function clearSelection(){ if(selected){ selected.el.classList.remove("selected"); selected=null; } }
+function handleTap(src, e){
+  if(src.type==="pigment"){
+    if(selected && selected.type==="pigment" && selected.id===src.id){ clearSelection(); return; }
+    clearSelection(); selected=src; src.el.classList.add("selected");
+    live.textContent = `${src.name} picked up. Choose a dish.`;
+  } else if(selected){
+    addToDish(src.d, selected, e && e.clientX ? {x:e.clientX,y:e.clientY} : null);
+  }
+}
+document.addEventListener("click", e=>{
+  const dish = e.target.closest(".dish");
+  if(!dish) return;
+  const d = dishes[+dish.dataset.dish];
+  if(!d.color && selected && e.detail!==0) addToDish(d, selected, {x:e.clientX,y:e.clientY});
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){ clearSelection(); return; }
+  if(e.key!=="Enter" && e.key!==" ") return;
+  const del = e.target.closest("[data-del]");
+  if(del){ e.preventDefault(); removeCustom(del.dataset.del); return; }
+  const src = sourceFromEl(e.target);
+  const dish = e.target.closest(".dish");
+  if(src && src.type==="pigment"){ e.preventDefault(); handleTap(src); }
+  else if(dish && selected){ e.preventDefault(); addToDish(dishes[+dish.dataset.dish], selected, null); }
+});
+
+renderPalette();
+</script>
+</body>
+</html>
